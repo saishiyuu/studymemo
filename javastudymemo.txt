@@ -1,0 +1,2424 @@
+不论是float 还是double都是浮点数，而计算机是二进制的，浮点数会失去一定的精确度。
+注:根本原因是:十进制值通常没有完全相同的二进制表示形式;十进制数的二进制表示形式可能不精确。只能无限接近于那个值
+但是，在项目中，我们不可能让这种情况出现，特别是金融项目，因为涉及金额的计算都必须十分精确
+1、简介
+Java在java.math包中提供的API类BigDecimal，用来对超过16位有效位的数进行精确的运算。双精度浮点型变量double可以处理16位有效数。在实际应用中，需要对更大或者更小的数进行运算和处理。float和double只能用来做科学计算或者是工程计算，在商业计算中要用java.math.BigDecimal。BigDecimal所创建的是对象，我们不能使用传统的+、-、*、/等算术运算符直接对其对象进行数学运算，而必须调用其相对应的方法。方法中的参数也必须是BigDecimal的对象。构造器是类的特殊方法，专门用来创建对象，特别是带有参数的对象。
+2、构造器描述 
+BigDecimal(int)       创建一个具有参数所指定整数值的对象。 
+BigDecimal(double) 创建一个具有参数所指定双精度值的对象。 //不推荐使用
+BigDecimal(long)    创建一个具有参数所指定长整数值的对象。 
+BigDecimal(String) 创建一个具有参数所指定以字符串表示的数值的对象。//推荐使用
+3、方法描述 
+add(BigDecimal)        BigDecimal对象中的值相加，然后返回这个对象。 
+subtract(BigDecimal) BigDecimal对象中的值相减，然后返回这个对象。 
+multiply(BigDecimal)  BigDecimal对象中的值相乘，然后返回这个对象。 
+divide(BigDecimal)     BigDecimal对象中的值相除，然后返回这个对象。 
+toString()                将BigDecimal对象的数值转换成字符串。 
+doubleValue()          将BigDecimal对象中的值以双精度数返回。 
+floatValue()             将BigDecimal对象中的值以单精度数返回。 
+longValue()             将BigDecimal对象中的值以长整数返回。 
+intValue()               将BigDecimal对象中的值以整数返回。
+JDK的描述：
+1、参数类型为double的构造方法的结果有一定的不可预知性。有人可能认为在Java中写入newBigDecimal(0.1)所创建的BigDecimal正好等于 0.1（非标度值 1，其标度为 1），但是它实际上等于0.1000000000000000055511151231257827021181583404541015625。这是因为0.1无法准确地表示为double（或者说对于该情况，不能表示为任何有限长度的二进制小数）。这样，传入到构造方法的值不会正好等于0.1（虽然表面上等于该值）。
+2、另一方面，String 构造方法是完全可预知的：写入 newBigDecimal("0.1") 将创建一个 BigDecimal，它正好等于预期的 0.1。因此，比较而言，通常建议优先使用String构造方法
+当double必须用作BigDecimal的源时，请使用Double.toString(double)转成String，然后使用String构造方法，或使用BigDecimal的静态方法valueOf，
+这边特别提一下，如果进行除法运算的时候，结果不能整除，有余数，这个时候会报java.lang.ArithmeticException: ，这边我们要避免这个错误产生，在进行除法运算的时候，针对可能出现的小数产生的计算，必须要多传两个参数divide(BigDecimal，保留小数点后几位小数，舍入模式)
+舍入模式
+ROUND_CEILING    //向正无穷方向舍入
+ROUND_DOWN    //向零方向舍入
+ROUND_FLOOR    //向负无穷方向舍入
+ROUND_HALF_DOWN    //向（距离）最近的一边舍入，除非两边（的距离）是相等,如果是这样，向下舍入, 例如1.55 保留一位小数结果为1.5
+ROUND_HALF_EVEN    //向（距离）最近的一边舍入，除非两边（的距离）是相等,如果是这样，如果保留位数是奇数，使用ROUND_HALF_UP，如果是偶数，使用ROUND_HALF_DOWN
+ROUND_HALF_UP    //向（距离）最近的一边舍入，除非两边（的距离）是相等,如果是这样，向上舍入, 1.55保留一位小数结果为1.6,也就是我们常说的<code>“四舍五入”</code>
+ROUND_UNNECESSARY    //计算结果是精确的，不需要舍入模式
+ROUND_UP    //向远离0的方向舍入
+需要对BigDecimal进行截断和四舍五入可用setScale方法
+
+构造器，又称为构造方法。构造器用于构造该类的实例，也就是对象。
+格式如下：[修饰符] 类名 (形参列表){//n条语句}
+构造方法是一种特殊的方法，与一般的方法区别： 　　
+1.构造方法的名字必须与定义他的类名完全相同，没有返回类型，甚至连void也没有。　　
+2.构造方法的调用是在创建一个对象时使用new操作进行的。构造方法的作用是初始化对象。　
+3.不能被static、final、synchronized、abstract和native修饰。构造方法不能被子类继承。　　
+构造方法可以被重载。没有参数的构造方法称为默认构造方法，与一般的方法一样，构造方法可以进行任何活动，但是经常将他设计为进行各种初始化活动，比如初始化对象的属性。　
+在Java中,任何变量在被使用前都必须先设置初值.Java提供了为类的成员变量赋初值的专门功能
+（2）构造方法的调用是在创建一个对象时使用new操作进行的。构造方法的作用是初始化对象。举例如下：
+Person p = new Person();
+person()调用的就是Person的构造方法；
+
+重载
+1.构造器的重载
+因为构造器的名字必须与类名相同，所以同一个类的所有构造器名肯定相同，构成重载；为了让系统能区分不同的构造器，多个构造器的参数列表必须不同。
+class Person{
+    int age;
+    String name;
+    public Person(){
+    }
+    public Person(int age){
+        this.age = age;
+    }
+    public Person(int age,String name){
+        this(age);
+        this.name = name;
+    }
+}
+2.方法的重载（overload）
+1.定义：在同一个类中，允许存在一个以上的同名方法，只要他们的参数个数或者参数类型不同即可。
+两同一不同”：同一个类、相同方法名
+参数列表不同：参数个数不同，参数类型不同
+2.举例：
+Arrays类中重载的sort() / binarySearch()
+3.判断是否重载：
+跟方法的权限修饰符、返回值类型、形参变量名、方法体都没有关系！
+class Person{
+    public void getSum(int i,int j){//A    
+        System.out.println("憨憨");
+    }
+    public void getSum(double d1,double d2){//B
+    }
+    public void getSum(String s,int i){//形参先后顺序不同，也构成重载//C
+    }
+    public void getSum(int i,String s){//D
+    }
+    public void getSum(int i,int j){//与方法体无关！！！！
+        return 0;
+    }
+    public void getSum(int m,int n){//与参数名无关！！！！
+     
+    }
+    private void getSum(int i,int j){//与权限修饰符大小无关！！！！
+     
+    }
+}
+
+重写
+为什么要重写：父类的功能无法满足子类的需求
+方法重写的前提：必须要存在继承的关系！
+应用：重写以后，当创建子类对象以后，通过子类对象调用子父类的同名参数的方法时，实际执行的时子类重写父类的方法
+重写的规定：
+方法的声明：权限修饰符 返回值类型 方法名(形参列表) throws 异常的类型{
+//方法体
+}
+A. 子类重写的方法的方法名和形参列表与父类被重写的方法的方法名和形参列表相同
+B. 子类重写的方法的权限修饰符不小于父类被重写的方法的权限修饰符
+>特殊情况：子类不能重写父类中声明为private权限的方法
+C. 返回值类型：
+>父类被重写的方法的返回值类型是void，则子类重写的方法的返回值类型只能是void
+>父类被重写的方法的返回值类型是A类型，则子类重写的方法的返回值类型可以是A类或A的子类
+//这样算重写，String是Object的子类
+pulbic Object show(){//父类方法
+}
+public String show(){//子类方法
+}
+//这样不是重写，返回值类型不同
+pulbic void catch(){//父类方法
+}
+pulbic int  catch(){//子类方法
+}
+>父类被重写的方法的返回值类型是基本数据类型(比如：double).则子类重写的方法的返回值类型必须是相同的（double）
+D.子类重写的方法抛出的异常类型不大于父类被重写的方法抛出的异常类型.（可以抛出异常类型更少、异常类型更小、不抛出异常）
+子类和父类中的同名同参数的方法要么都声明为非static的(考虑重写)，要么都声明为static的(不是重写)。
+E.静态方法不能被重写
+原因：重写依赖于类的实例，而静态方法和类实例并没有什么关系。而且静态方法和类实例并没有什么关系。而且静态方法在编译时就已经确定，而方法重写是在运行时确定的(动态绑定)。（也可以说java多态体现在运行时、而static在编译时、与之相悖）
+区分方法的重载和重写
+重载：不表现为多态性。
+重写：表现为多态性。
+从编译和运行的角度来看：
+重载，是指允许存在多个同名方法，而这些方法的参数不同。编译器根据方法不同的参数列表，对同名方法的名称做修饰。对于编译器而言，这些同名方法就成了不同的方法。他们的调用地址在编译期间就绑定了。Java的重载是可以包括父类和子类的，即子类可以重载父类的同名不同参数的方法。
+所以：对于重载而言，在方法调用之前，编译器就已经确定了所要调用的方法，这称为“早绑定”或“静态绑定”；
+而对于多态，只有等到方法调用的那一刻，解释运行器才会确定所要调用的具体方法，这称为“晚绑定”或“动态绑定”；
+重写规则补充
+1.父类的抽象方法可以被子类通过两种途径重写(即实现和重写)。
+2.父类的非抽象方法可以被重写为抽象方法(此时：子类必须为抽象类)。
+
+@Autowired 注解的作用
+这个注解是属于 Spring 的容器配置的一个注解，因此 @Autowired 注解是一个用于容器 ( container ) 配置的注解。
+在 Spring 的世界当中，自动装配指的就是使用将 Spring 容器中的 bean 自动的和我们需要这个 bean 的类组装在一起。
+
+Spring IoC 容器
+IoC 容器
+Spring 容器是Spring框架的核心。容器将创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring 容器使用依赖注入（DI）来管理组成一个应用程序的组件。这些对象被称为 Spring Beans。
+通过阅读配置元数据提供的指令，容器知道对哪些对象进行实例化，配置和组装。配置元数据可以通过 XML，Java注释或Java代码来表示。下图是Spring如何工作的高级视图。Spring IoC容器利用Java的POJO类和配置元数据来生成完全配置和可执行的系统或应用程序。
+IOC容器具有依赖注入功能的容器，它可以创建对象，IOC容器负责实例化、定位、配置应用程序中的对象及建立这些对象间的依赖。通常new一个实例，控制权由程序员控制，而"控制反转"是指new实例工作不由程序员来做而是交给Spring容器来做。在Spring中BeanFactory是IOC容器的实际代表者。
+ApplicationContext 容器包括 BeanFactory 容器的所有功能，所以通常不建议使用BeanFactory。BeanFactory 仍然可以用于轻量级的应用程序，如移动设备或基于 applet 的应用程序，其中它的数据量和速度是显著。
+
+Spring ApplicationContext 容器
+Application Context是 BeanFactory 的子接口，也被称为 Spring 上下文。
+Application Context是 spring 中较高级的容器。和BeanFactory类似，它可以加载配置文件中定义的 bean，将所有的 bean 集中在一起，当有请求的时候分配 bean。另外，它增加了企业所需要的功能，比如，从属性文件中解析文本信息和将事件传递给所指定的监听器。这个容器在 org.springframework.context.ApplicationContext interface 接口中定义。
+ApplicationContext包含BeanFactory所有的功能，一般情况下，相对于BeanFactory，ApplicationContext 会更加优秀。当然，BeanFactory 仍可以在轻量级应用中使用，比如移动设备或者基于applet的应用程序。
+
+Bean定义
+被称作 bean 的对象是构成应用程序的支柱也是由 Spring IoC 容器管理的。bean 是一个被实例化，组装，并通过 Spring IoC 容器所管理的对象。这些 bean 是由用容器提供的配置元数据创建的
+bean 定义包含称为配置元数据的信息，下述容器也需要知道配置元数据：
+如何创建一个 bean
+bean 的生命周期的详细信息
+bean 的依赖关系
+上述所有的配置元数据转换成一组构成每个 bean 定义的下列属性。
+属性	描述
+class	这个属性是强制性的，并且指定用来创建 bean 的 bean 类。
+name	这个属性指定唯一的 bean 标识符。在基于 XML 的配置元数据中，你可以使用 ID 和/或 name 属性来指定 bean 标识符。
+scope	这个属性指定由特定的 bean 定义创建的对象的作用域，它将会在 bean 作用域的章节中进行讨论。
+constructor-arg	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。
+properties	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。
+autowiring mode	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。
+lazy-initialization mode	延迟初始化的 bean 告诉 IoC 容器在它第一次被请求时，而不是在启动时去创建一个 bean 实例。
+initialization 方法	在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。
+destruction 方法	当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。
+Spring 配置元数据
+Spring IoC 容器完全由实际编写的配置元数据的格式解耦。有下面三个重要的方法把配置元数据提供给 Spring 容器：
+基于 XML 的配置文件
+基于注解的配置
+基于 Java 的配置
+提示：对于基于 XML 的配置，Spring 2.0 以后使用 Schema 的格式，使得不同类型的配置拥有了自己的命名空间，使配置文件更具扩展性。
+
+Spring Bean 作用域
+Bean 的作用域
+当在 Spring 中定义一个 bean 时，你必须声明该 bean 的作用域的选项。例如，为了强制 Spring 在每次需要时都产生一个新的 bean 实例，你应该声明 bean 的作用域的属性为 prototype。同理，如果你想让 Spring 在每次需要时都返回同一个bean实例，你应该声明 bean 的作用域的属性为 singleton。
+Spring 框架支持以下五个作用域，分别为 singleton、prototype、request、session 和 global session
+
+Content-Type，内容类型，一般是指网页中存在的Content-Type，用于定义网络文件的类型和网页的编码，决定浏览器将以什么形式、什么编码读取这个文件，比如用PHP输出图片文件、JSON数据、XML文件等非HTML内容时，就必须用header函数来指定Content-Type，才能达到输出一张图片或是其它指定内容类型的需求。
+
+StringUtils 方法的操作对象是 Java.lang.String 类型的对象，是 JDK 提供的 String 类型操作方法的补充，并且是 null 安全的(即如果输入参数 String 为 null 则不会抛出 NullPointerException ，而是做了相应处理，例如，如果输入为 null 则返回也是 null 等，具体可以查看源代码)。
+StringUtils.isNotEmpty(String str)
+判断某字符串是否非空，等于!isEmpty(String str)，这里不能排除空格字符
+StringUtils.isNotEmpty(" ") = true
+StringUtils.isNotBlank(String str)
+判断某字符串是否不为空且长度不为0且不由空白符(whitespace)构成，等于!isBlank(String str)
+StringUtils.isNotBlank(" ") = false
+StringUtils.equals(String str1,String str2)
+比较两个字符串是否相等，如果两个均为空则认为相等
+StringUtils.trim(String str)
+去除字符串两端的控制符，空字符串、null返回null
+StringUtils.length
+
+红黑树
+二叉树简单来说就是每个非叶子节点都有且只有两个孩子，分别叫做左孩子和右孩子。
+二叉树中有一类特殊的树叫二叉查找树，二叉查找树是一种有序的树，对于每个非叶子节点，其左子树的值都小于它，其右子树的值都大于它。
+比二叉查找树更进一步的是二叉平衡树，二叉平衡树除了保证有序外，还能够保持每个节点左右子树的高度相差不超过1。常见的平衡树有AVL树，Treap，红黑树，伸展树，等等
+红黑树是一种二叉查找树，但在每个节点上增加一个存储位表示节点的颜色，可以是RED或BLACK。通过对任何一条从根到叶子的路径上各个节点着色方式的限制，红黑树确保没有一条路径会比其他路径长出两倍，因而是接近平衡的。
+红黑树满足一下5个性质：
+每个节点是红色或者黑色；
+根节点是黑色；
+每个叶子节点NIL是黑色；
+如果一个节点是红色，则它的两个孩子都是黑色；（每条路径上不能有两个连续的红色节点）
+任一节点到其所有子孙叶子节点NIL的路径上包含相同数目的黑色节点。
+注意，在红黑树中，把传统二叉树的叶子节点的孩子指向NIL，称NIL为红黑树中的叶子节点。NIL节点中含有指向父节点的指针，这可能是需要把null改为NIL的原因。
+
+1、什么是HashMap？
+HashMap基于哈希表的Map接口实现，是以 key-value 存储形式存在 ，HashMap 的实现不是同步的，这意味着它不是线程安全的。它的 key、value 都可以为 null，此外，HashMap 中的映射不是有序的。
+2、HashMap的特性
+Hash存储无序的
+key和value都可以存储null值，但是key只能存唯一的一个null值
+jdk8之前的数据结构是数组+链表，Jdk8之后变成数组+链表+红黑树
+阀值大于8并且数组长度大于64才会转为红黑树
+3、HashMap的数据结构
+JDK7的情况，是数组加链接，hash冲突时候，就转换为链表
+jdk8的情况，jdk8加上了红黑树，链表的数量大于8而且数组长度大于64之后，就转换为红黑树，红黑树节点小于6之后，就又转换为链表：
+4、HashMap初始化操作
+
+ConcurrentHashMap
+ConcurrentHashMap(简称CHM)是在Java 1.5作为Hashtable的替代选择新引入的，是concurrent包的重要成员。
+在Java 1.5之前，如果想要实现一个可以在多线程和并发的程序中安全使用的Map,只能在HashTable和synchronized Map中选择，因为HashMap并不是线程安全的。
+但再引入了CHM之后，我们有了更好的选择。
+CHM不但是线程安全的，而且比HashTable和synchronizedMap的性能要好。相对于HashTable和synchronizedMap锁住了整个Map，CHM只锁住部分Map。
+CHM允许并发的读操作，同时通过同步锁在写操作时保持数据完整性。
+ConcurrentHashMap并发度高的原因
+ConcurrentHashMap 采用了分段锁技术，其中 Segment 继承于 ReentrantLock。
+不会像 HashTable 那样不管是 put 还是 get 操作都需要做同步处理，理论上 ConcurrentHashMap 支持 CurrencyLevel (Segment 数组数量)的线程并发。
+每当一个线程占用锁访问一个 Segment 时，不会影响到其他的 Segment。
+就是说如果容量大小是16他的并发度就是16，可以同时允许16个线程操作16个Segment而且还是线程安全的。
+public V put(K key, V value) {
+    Segment<K,V> s;
+    if (value == null)
+        throw new NullPointerException();//这就是为啥他不可以put null值的原因
+    int hash = hash(key);
+    int j = (hash >>> segmentShift) & segmentMask;
+    if ((s = (Segment<K,V>)UNSAFE.getObject          
+         (segments, (j << SSHIFT) + SBASE)) == null) 
+        s = ensureSegment(j);
+    return s.put(key, hash, value, false);
+}
+他先定位到Segment，然后再进行put操作。
+我们看看他的put源代码，你就知道他是怎么做到线程安全的了，关键句子我注释了。
+        final V put(K key, int hash, V value, boolean onlyIfAbsent) {
+          // 将当前 Segment 中的 table 通过 key 的 hashcode 定位到 HashEntry
+            HashEntry<K,V> node = tryLock() ? null :
+                scanAndLockForPut(key, hash, value);
+            V oldValue;
+            try {
+                HashEntry<K,V>[] tab = table;
+                int index = (tab.length - 1) & hash;
+                HashEntry<K,V> first = entryAt(tab, index);
+                for (HashEntry<K,V> e = first;;) {
+                    if (e != null) {
+                        K k;
+ // 遍历该 HashEntry，如果不为空则判断传入的 key 和当前遍历的 key 是否相等，相等则覆盖旧的 value。
+                        if ((k = e.key) == key ||
+                            (e.hash == hash && key.equals(k))) {
+                            oldValue = e.value;
+                            if (!onlyIfAbsent) {
+                                e.value = value;
+                                ++modCount;
+                            }
+                            break;
+                        }
+                        e = e.next;
+                    }
+                    else {
+                 // 不为空则需要新建一个 HashEntry 并加入到 Segment 中，同时会先判断是否需要扩容。
+                        if (node != null)
+                            node.setNext(first);
+                        else
+                            node = new HashEntry<K,V>(hash, key, value, first);
+                        int c = count + 1;
+                        if (c > threshold && tab.length < MAXIMUM_CAPACITY)
+                            rehash(node);
+                        else
+                            setEntryAt(tab, index, node);
+                        ++modCount;
+                        count = c;
+                        oldValue = null;
+                        break;
+                    }
+                }
+            } finally {
+               //释放锁
+                unlock();
+            }
+            return oldValue;
+        }
+首先第一步的时候会尝试获取锁，如果获取失败肯定就有其他线程存在竞争，则利用 scanAndLockForPut() 自旋获取锁。
+尝试自旋获取锁。
+如果重试的次数达到了 MAX_SCAN_RETRIES 则改为阻塞锁获取，保证能获取成功。
+get的逻辑
+get 逻辑比较简单，只需要将 Key 通过 Hash 之后定位到具体的 Segment ，再通过一次 Hash 定位到具体的元素上。
+由于 HashEntry 中的 value 属性是用 volatile 关键词修饰的，保证了内存可见性，所以每次获取时都是最新值。
+ConcurrentHashMap 的 get 方法是非常高效的，因为整个过程都不需要加锁。
+1.7虽然可以支持每个Segment并发访问，但是还是存在一些问题
+是的，因为基本上还是数组加链表的方式，我们去查询的时候，还得遍历链表，会导致效率很低，这个跟jdk1.7的HashMap是存在的一样问题，所以他在jdk1.8完全优化了。
+jdk1.8的数据结构
+其中抛弃了原有的 Segment 分段锁，而采用了 CAS + synchronized 来保证并发安全性。
+跟HashMap很像，也把之前的HashEntry改成了Node，但是作用不变，把值和next采用了volatile去修饰，保证了可见性，并且也引入了红黑树，在链表大于一定值的时候会转换（默认是8）。
+ConcurrentHashMap值的存取操作以及是怎么保证线程安全的
+根据 key 计算出 hashcode 。
+判断是否需要进行初始化。
+即为当前 key 定位出的 Node，如果为空表示当前位置可以写入数据，利用 CAS 尝试写入，失败则自旋保证成功。
+如果当前位置的 hashcode == MOVED == -1,则需要进行扩容。
+如果都不满足，则利用 synchronized 锁写入数据。
+如果数量大于 TREEIFY_THRESHOLD 则要转换为红黑树。
+CAS是什么？自旋又是什么
+CAS 是乐观锁的一种实现方式，是一种轻量级锁，JUC 中很多工具类的实现就是基于 CAS 的。
+CAS 操作的流程如下图所示，线程在读取数据时不进行加锁，在准备写回数据时，比较原值是否修改，若未被其他线程修改则写回，若已被修改，则重新执行读取流程。
+这是一种乐观策略，认为并发操作并不总会发生。
+就比如我现在要修改数据库的一条数据，修改之前我先拿到他原来的值，然后在SQL里面还会加个判断，原来的值和我手上拿到的他的原来的值是否一样，一样我们就可以去修改了，不一样就证明被别的线程修改了你就return错误就好了
+CAS就一定能保证数据没被别的线程修改过么？
+并不是的，比如很经典的ABA问题，CAS就无法判断了。就是说来了一个线程把值改回了B，又来了一个线程把值又改回了A，对于这个时候判断的线程，就发现他的值还是A，所以他就不知道这个值到底有没有被人改过，其实很多场景如果只追求最后结果正确，这是没关系的。
+但是实际过程中还是需要记录修改过程的，比如资金修改什么的，你每次修改的都应该有记录，方便回溯。
+怎么解决ABA问题？
+用版本号去保证就好了，就比如说，我在修改前去查询他原来的值的时候再带一个版本号，每次判断就连值和版本号一起判断，判断成功就给版本号加1。
+时间戳也可以，查询的时候把时间戳一起查出来，对的上才修改并且更新值的时候一起修改更新时间，这样也能保证，方法很多但是跟版本号都是异曲同工之妙
+CAS性能很高，但是我知道synchronized性能可不咋地，为啥jdk1.8升级之后反而多了synchronized？
+synchronized之前一直都是重量级的锁，但是后来java官方是对他进行过升级的，他现在采用的是锁升级的方式去做的。
+针对 synchronized 获取锁的方式，JVM 使用了锁升级的优化方式，就是先使用偏向锁优先同一线程然后再次获取锁，如果失败，就升级为 CAS 轻量级锁，如果失败就会短暂自旋，防止线程被系统挂起。最后如果以上都失败就升级为重量级锁。
+ConcurrentHashMap的get操作又是怎么样子的呢？
+根据计算出来的 hashcode 寻址，如果就在桶上那么直接返回值。
+如果是红黑树那就按照树的方式获取值。
+就不满足那就按照链表的方式遍历获取值。
+1.8 在 1.7 的数据结构上做了大的改动，采用红黑树之后可以保证查询效率（O(logn)），甚至取消了 ReentrantLock 改为了 synchronized，这样可以看出在新版的 JDK 中对 synchronized 优化是很到位的
+一、创建ConcurrentHashMap对象
+// 创建容量为8，负载系数为0.6的ConcurrentHashMap
+ConcurrentHashMap<Key, Value> numbers = new ConcurrentHashMap<>(8, 0.6f);
+Key - 用于关联Map中每个元素的唯一标识
+Value - Map中每个元素，可以通过key值获取value
+capacity容量 - 第一个参数表示这个map的容量是8，也就是说这个对象可以存储8个键值对
+loadFactor负载因子 - 这个map对象的负载因子是 0.6. 这意味着，每当我们的哈希表被填满60%的时候，条目就会被移动到一个新的哈希表，其容量大小是原来哈希表的两倍。
+默认情况下capacity=16，loadFactor=0.75
+二、ConcurrentHashMap常用方法
+2.1. 向ConcurrentHashMap插入元素
+put(K,V) - 向map中插入key/value 键值对数据
+putAll(map) - 把另一个map中的所有entries插入到当前的map中
+putIfAbsent(K,V) - 向map中插入key/value 键值对数据，如果该键值对的key在map不存在则插入数据，否则不做操作。
+2.2.批量获取ConcurrentHashMap 元素
+entrySet()- 获取 map中key/value 键值对集合
+keySet()- 获取map中所有的key的集合
+values()- 获取map中所有的value的集合
+2.3. 获取指定Key元素的value值
+get() - 获取指定key元素的value值，如果key不存在返回null
+getOrDefault() - 获取指定key元素的value值，如果key不存在返回一个指定的默认值
+2.4.移除ConcurrentHashMap中的元素
+remove(key) - 根据指定的key删除map中的元素，并将该元素返回
+remove(key, value) - 只有当map中存在指定的键映射到指定的值时，才会从map中删除条目，并返回一个布尔值。返回true表示删除成功，否则表示map中没有这个键值对。
+
+ArrayList和LinkedList区别
+1.ArrayList是实现了基于动态数组的数据结构，而LinkedList是基于链表的数据结构；
+2.对于随机访问get和set，ArrayList要优于LinkedList，因为LinkedList要移动指针；
+3.对于添加和删除操作add和remove，一般大家都会说LinkedList要比ArrayList快，因为ArrayList要移动数据。但是实际情况并非这样，对于添加或删除，LinkedList和ArrayList并不能明确说明谁快谁慢，下面会详细分析。
+从源码可以看出，ArrayList想要get(int index)元素时，直接返回index位置上的元素，而LinkedList需要通过for循环进行查找，虽然LinkedList已经在查找方法上做了优化，比如index < size / 2，则从左边开始查找，反之从右边开始查找，但是还是比ArrayList要慢
+ArrayList想要在指定位置插入或删除元素时，主要耗时的是System.arraycopy动作，会移动index后面所有的元素；LinkedList主耗时的是要先通过for循环找到index，然后直接插入或删除。
+当数据量较小时，测试程序中，大约小于30的时候，两者效率差不多，没有显著区别；当数据量较大时，大约在容量的1/10处开始，LinkedList的效率就开始没有ArrayList效率高了，特别到一半以及后半的位置插入时，LinkedList效率明显要低于ArrayList，而且数据量越大，越明显。
+ArrayList简介
+ArrayList是一个其容量能够动态增长的动态数组。它继承了AbstractList，实现了List、RandomAccess, Cloneable, java.io.Serializable。
+基本的ArrayList，长于随机访问元素，但是在List中间插入和移除元素时较慢。同时，ArrayList的操作不是线程安全的,一般在单线程中才使用ArrayList，而在多线程中一般使用Vector或者CopyOnWriteArrayList。
+迭代器遍历
+Iterator<Integer> it = arrayList.iterator();
+while(it.hasNext()){
+    System.out.print(it.next() + " ");
+}
+索引值遍历
+for(int i = 0; i < arrayList.size(); i++){
+   System.out.print(arrayList.get(i) + " ");
+}
+for循环遍历
+for(Integer number : arrayList){
+   System.out.print(number + " ");
+}
+需要说明的是，遍历ArrayList时，通过索引值遍历效率最高，for循环遍历次之，迭代器遍历最低
+toArray()的使用
+有时候，当我们调用ArrayList中的 toArray()，可能遇到过抛出java.lang.ClassCastException异常的情况，这是由于toArray() 返回的是 Object[] 数组，将 Object[] 转换为其它类型(如，将Object[]转换为的Integer[])则会抛出java.lang.ClassCastException异常，因为Java不支持向下转型。
+
+什么是Stream流
+Stream流是数据渠道，用于操作数据源（集合、数组等）所生成的元素序列。
+Stream的优点：声明性，可复合，可并行。这三个特性使得stream操作更简洁，更灵活，更高效。
+Stream的操作有两个特点：可以多个操作链接起来运行，内部迭代。
+Stream可分为并行流与串行流，Stream API 可以声明性地通过 parallel() 与sequential() 在并行流与顺序流之间进行切换。
+注意 ：
+1、Stream不会自己存储数据。
+2、Stream不会改变原对象，他们会返回一个新的Stream。
+3、Stream操作是延迟的，他们会等到需要的结果时才执行。
+4、使用并行流并不一定会提高效率，因为jvm对数据进行切片和切换线程也是需要时间的。
+5.一个 Stream 只可以使用一次
+流是字节序列的抽象概念。
+文件是数据的静态存储形式，而流是指数据传输时的形态。
+流类分为两个大类：节点流类和过滤流类（也叫处理流类）。
+程序用于直接操作目标设备所对应的类叫节点流类，程序也可以通过一个间接流类去调用节点流类，以达到更加灵活方便地读取各种类型的数据，这个间接流类就是过滤流类（也叫处理流类），或者称为包装类。
+Java中的"流"就是指把数据从一个对象移动到另一个对象的流动模式的抽象。其实Java的流模式用水流或者电流模型来解释是很容易理解的。
+James Gosling的Java流模式图与水流模式图概念映射。数据源(data source)即水库，数据目的地(data destination)就是脸盆，数据(data)就是水，流(stream)实例化就是在管子中流动的水流。
+输入流(input stream)就是用水泵从水库中抽出来要到水管中的水，输出流(output stream)经过水龙头将要达到脸盆中的水，计算机内存(memory)就是上图中的水流管道，关闭输入流(close input stream)就是关闭水泵开关，关闭输出流(close output stream)就是关闭关闭水龙头开关。
+更进一步说，具体的水库和脸盆分别对应于Java中输入流对象和输出流对象。水流可以分成一粒一粒的水分子，这些水分子映射成计算机二进制位(bit)0/1，其组成的水滴映射成计算机字节流(字节是计算机储存信息的基本单位)。字节流和字符流在物理层面的实现都是比特流，二进制数据流可以认为是字节流，而字符流是遵循unicode编码规则的字节流。因此计算机中的"流"概念实际上就是指字节数据(bytes data)从源对象对按顺序流向目标对象的一种流动形式。
+按照流的方向不同：分为输入流和输出流。
+按照处理数据单位的不同：分为字节流（8位）和字符流（16位）。
+字节流默认是不带缓冲区的，而字符流默认是带缓冲区的。
+字节流是底层数据流，是数据有意义的最小单位。字符流是字节流的包装，底层实现是字节流。
+字节流读取的时候，读到一个字节就返回一个字节；字符流使用了字节流读到一个或多个字节（中文对应的字节数是两个，在UTF-8码表中是3个字节）时。先去查指定的编码表，将查到的字符返回。
+字节流可以处理所有类型数据，如：图片，MP3，AVI视频文件，而字符流只能处理字符数据。只要是处理纯文本数据，就要优先考虑使用字符流，除此之外都用字节流。文本文件可以用字节流来实现，当然使用字符流速度会更快。
+字节输入流类：FileInputStream、BufferedInputStream和DataInputStream
+FileInputStream:此类用于从本地文件系统中读取文件内容。
+构造方法：
+FileInputStream(File file):打开一个到实际文件的连接来创建一个FileInputStream，该文件通过文件系统中的File对象file指定。
+FileInputStream(String name):打开一个到实际文件的连接来创建一个FileInputStream，该文件通过文件系统中的路径名name指定。
+常用方法：
+int available():返回下一次对此输入流调用的方法不受阻塞地从此输入流读取（或跳过）的估计剩余字节数。
+void close():关闭此文件输入流并释放与该流关联的所有系统资源。
+BufferedInputStream：此类本身带有一个缓冲区，在读取数据时，先放到缓冲区中，可以减少对数据源的访问，提高运行的效率。
+构造方法：
+BufferedInputStream(InputStream in):创建一个BufferedInputStream并保存其参数，即输入流in，以便将来使用。
+BufferedInputStream(InputStream in,int size):创建一个具有指定缓冲区大小的BufferedInputStream并保存其参数，即输入流in，以便将来使用。
+常用方法：
+int available():返回下一次对此输入流调用的方法不受阻塞地从此输入流读取（或跳过）的估计剩余字节数。
+void close():关闭此输入流并释放与该流关联的所有系统资源。
+int read():从输入流中读取数据的下一个字节。
+int read(byte[] b,int off,int len):从此字节输入流中给定偏移量处开始将各字节读取到指定的byte数组中。
+DataInputStream:该类提供一些基于多字节读取方法，从而可以读取基本数据类型的数据。
+
+构造方法：
+DataInputStream(InputStream in):使用指定的底层InputStream创建一个DataInputStream。
+常用方法：
+int read(byte[] b):从包含的输入流中读取一定数量的字节，并将它们存储到缓冲区数组b中。
+int read(byte[] b,int off,int len):从包含的输入流中将最多len个字节读入一个byte数组中。
+
+字节输出流类：FileOutputStream、BufferedOutputStream和DataOutputStream
+FileOutputStream:此类用于从本地文件系统的文件中写入数据。
+
+构造方法：
+FileOutputStream(File file):创建一个向指定File对象表示的文件中写入数据的文件输出流。FileOutputStream(String name):创建一个向具有指定名称的文件中写入数据的输出文件流。
+常用方法：
+void close():关闭此文件输出流并释放与此流有关的所有系统资源。
+FileDescriptor getFD():返回与此流有关的文件描述符。
+void write(byte[] b):将b.length个字节从指定byte数组写入此文件输出流中。
+void write(byte[] b,int off,int len):将指定byte数组中从偏移量off开始的len个字节写入此文件输出流。
+void write(int b):将指定字节写入此文件输出流。
+BufferedOutputStream:此类本身带有一个缓冲区，在写入数据时，先放到缓冲区中，实现缓冲的数据流。
+
+构造方法：
+BufferedOutputStream(OutputStream out):创建一个新的缓冲输出流，来将数据写入指定的底层输入流。
+BufferedOutputStream(OutputStream out,int size):创建一个新的缓冲输出流，来将具有指定缓冲区大小的数据写入指定的底层输出流。
+常用方法：
+void flush():刷新此缓冲的输出流。
+void write(byte[] b,int off,int len):将指定byte数组中从偏移量off开始的len个字节写入此缓冲的输出流。
+void write(int b):将指定的字节写入此缓冲的输出流。
+DataOutputStream(OutputStream out):创建一个新的数据输出流，将数据写入指定基础输出流。
+
+常用方法：
+void flush():清空此数据输出流。
+int size()：返回计数器written的当前值，即到目前为止写入此数据输出流的字节数。
+void write(byte[] b,int off,int len):将指定byte数组中从偏移量off开始的len个字节写入基础输出流。
+void write(int b):将指定字节（参数b的八个低位）写入基础输出流。
+2、字符流
+FileReader:用来读取字符文件的便捷类。此类的构造方法假定默认字符编码和默认字节缓冲区大小都是适当的
+
+构造方法：
+FileReader(File file):在给定从中读取数据的File的情况下创建一个新的FileReader。FileReader(String fileName):在给定从中读取数据的文件名的情况下创建一个新的FileReader。
+
+BufferedReader类是Reader类的子类，为Reader对象添加字符缓冲器，为数据输入分配内存存储空间，存取数据更为有效。
+
+构造方法：
+BufferedReader(Reader in):创建一个使用默认大小输入缓冲区的缓冲字符输入流。
+BufferedReader(Reader in,int sz):创建一个使用指定大小输入缓冲区的缓冲字符输入流。
+
+操作方法：
+void close():关闭该流并释放与之关联的所有资源。
+void mark(int readAheadLimit):标记流中的当前为止。
+boolean markSupported();判断此流是否支持mark()操作。
+int read():读取单个字符。
+int read(char[] cbuf,int off,int len):将字符读入数组的某一部分。
+String readLine():读取一个文本行。
+boolean ready():判断此流是否已准备好被读取。
+void reset():将流重置到最新的标记。
+long skip(long n):跳过字符。
+FileWriter:用来写入字符文件的便捷类，可用于写入字符流。
+构造方法：
+FileWriter(File file):根据给定的File对象构造一个FileWriter对象。
+FileWriter(String filename):根据给定的文件名构造一个FileWriter对象。
+BufferedWriter: 将文本写入字符输出流，缓冲各个字符，从而提供单个字符、数组和字符串的高效写入。
+缓冲流的目的:
+操作流的时候，习惯定义一个byte/char数组。
+int read(): 每次都从磁盘文件中读取一个字节。 直接操作磁盘文件性能极低。
+解决方案：定义一个数组作为缓冲区。
+byte[] buffer = new byte[1024]；该数组其实就是一个缓冲区。
+一次性从磁盘文件中读取1024个字节。如此以来，操作磁盘文件的次数少了，性能得以提升。提供的默认缓存区大小是8192(1024*8)，我们一般不用修改大小
+public class BufferStreamDemo {
+    public static void main(String[] args) throws Exception {
+        File file = new File("file/aaa.txt");
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+        out.write("中国".getBytes());
+        out.close();
+        BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+        byte[] buffer = new byte[1024];
+        int len = -1;
+        while((len = in.read(buffer)) != -1){
+            System.out.println(new String(buffer, 0, len));
+        }
+        in.close();
+    }
+}
+public class BufferCharacterDemo {
+    public static void main(String[] args) throws Exception {
+        File file = new File("file/aaa.txt");
+        BufferedWriter in = new BufferedWriter(new FileWriter(file,true));
+        in.newLine();//用来换行等同于‘\n'
+        in.write("美国");
+        in.newLine();
+        in.write("马来西亚");
+        in.close();
+        BufferedReader out = new BufferedReader(new FileReader(file));
+        String line = null;
+        //按行读取
+        while((line = out.readLine()) != null){
+            System.out.println(line);
+        }
+        out.close();
+    }
+}
+按照功能不同：分为节点流和处理流。节点流(又称低级流)、过滤流(又称高级流、处理流、包装流)
+节点流：是可以从一个特定的数据源（节点）读写数据的流（例如文件，内存）。就像是一条单一的管子接到水龙头上开始放水。
+处理流：是“连接”在已经存在的流（节点流或处理流）之上，通过对数据的处理为程序提供更为强大的读写功能。就像在已经接了一条管子（节点流）的基础上，又套上几个更粗，具有特殊功能的管子（处理流）对流出的水进一步的处理。
+四种基本流InputStream，OutputStream，Reader，Writer又分别有更具体的子类，分为文件流，缓冲流，数据流，转换流，Print流，Object流等，都分别有特定的功能或用来操作特定的数据。其中深颜色的代表节点流，浅颜色的代表处理流。
+节点流分别对File（文件），Array（内存中的一个数组），String（字符串），Pipe（管道）进行处理。
+常用的处理流有：缓冲流，转换流，数据流，对象流，打印流。
+节点流(Node Stream)是流管道两端直接连接data source和data destination上的，即为取放数据的真实载体，在流通道本身不对数据做任何加工，因而也被称为低级流。
+
+节点流从一个特定的数据源读写数据。即节点流是直接操作文件，网络等的流，例如FileInputStream和FileOutputStream，他们直接从文件中读取或往文件中写入字节流。
+“连接”在已存在的流（节点流或处理流）之上通过对数据的处理为程序提供更为强大的读写功能。过滤流是使用一个已经存在的输入流或输出流连接创建的，过滤流就是对节点流进行一系列的包装。例如BufferedInputStream和BufferedOutputStream，使用已经存在的节点流来构造，提供带缓冲的读写，提高了读写的效率，以及DataInputStream和DataOutputStream，使用已经存在的节点流来构造，提供了读写Java中的基本数据类型的功能。他们都属于过滤流。
+public static void main(String[] args) throws IOException {
+        // 节点流FileOutputStream直接以A.txt作为数据源操作
+        FileOutputStream fileOutputStream = new FileOutputStream("A.txt");
+        // 过滤流BufferedOutputStream进一步装饰节点流，提供缓冲写
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
+                fileOutputStream);
+        // 过滤流DataOutputStream进一步装饰过滤流，使其提供基本数据类型的写
+        DataOutputStream out = new DataOutputStream(bufferedOutputStream);
+        out.writeInt(3);
+        out.writeBoolean(true);
+        out.flush();
+        out.close();
+        // 此处输入节点流，过滤流正好跟上边输出对应，读者可举一反三
+        DataInputStream in = new DataInputStream(new BufferedInputStream(
+                new FileInputStream("A.txt")));
+        System.out.println(in.readInt());
+        System.out.println(in.readBoolean());
+        in.close();
+}
+FileOutputStream是根据二进制010101一个一个字节处理
+BufferedOutputStream是对字节封装成buffered，以缓冲区处理
+DataOutputStream是以字符串形式，类似（“hello”）处理。
+缓冲流：要套接在相应的字节流之上，对读写的数据提供了缓冲功能，提高了读写的效率，同时也增加了一些更方便方法。
+缓冲流的作用就像一个桶，原本的字节流是个水管，水管直接连到目的地，加了缓冲流之后，就是在水管下接了一个桶，等桶接满水后再倒入目的地。起到了缓冲的作用。这样就可以一次读到更多的数据，避免了频繁的读写硬盘。由于带了缓冲功能，所以就写数据的时候需要使用flush方法。
+import java.io.*; 
+public class TestBufferStream{ 
+  public static void main(String[] args){ 
+    try{ 
+       BufferedWriter bw=new BufferedWriter(new FileWriter("F:\\Java\\IO\\dat.txt"));//在对写文件的字节流上套接上缓冲流 
+       BufferedReader br=new BufferedReader(new FileReader("F:\\Java\\IO\\dat.txt"));//在对读文件的字节流上套接上缓冲流 
+       String s=null; 
+       for(int i=1;i<=100;i++){ 
+        s=String.valueOf(Math.random());//通过随机函数给s赋值 
+        bw.write(s);          //将s写入到dat.txt文件中 
+        bw.newLine();          //写入一个分行符。缓冲流比较好用的方法就是可以写入或读取一行的数据。 
+       } 
+       bw.flush();            //使内存中的所有数据立刻写出，不再缓冲。 
+       while((s=br.readLine())!=null){  //按行读取文件内容 
+        System.out.println(s); 
+       } 
+       bw.close();            //关闭处理流同时关闭里面的节点流。 
+       br.close(); 
+        
+    } 
+    catch(IOException e){ 
+       e.printStackTrace(); 
+    } 
+  } 
+} 
+转换流：用与字节数据到字符数据之间的转化。InputStreamReader需要和InputStream套接，OutputStreamWriter需要和outputStream套接。
+数据流：DataInputStream 和DataOutputStream.提供将基础数据类型写入到文件中，或者读取出来，这个流的用处还是很大的，如果没有这种流的话，有一个long，本身只占8个字节，如果我要写入到文件，需要转成字符串，然后在转成字符数组，那空间会占用很多，但是有了这种流之后就很方便了，直接将这8个字节写到文件就可以了，既节约了内存空间也使程序写起来更加方便简单。但是读取的时候需要注意了，根据读取的数据类型，指针会往下移，所以你读的顺序必须要和写的顺序一致才能完成你正确的需求。否则就相当与把数据拆分了。
+import java.io.*; 
+public class TestDataStream{ 
+   public static void main(String[] args){ 
+     ByteArrayOutputStream baos=new ByteArrayOutputStream();  //建一个节点流。 
+     DataOutputStream dos=new DataOutputStream(baos);     //在节点流上接一根数据流“管道”                  try{ 
+       dos.writeDouble(Math.random());            //double型 ，占8个字节  
+       dos.writeBoolean(true);                //boolean型，占一个字节 
+       ByteArrayInputStream bais=new ByteArrayInputStream(baos.toByteArray());  
+       System.out.println(bais.available());         //输出流中总的可用字节数--9 
+       DataInputStream dis=new DataInputStream(bais);    //同样在输出流的外面接上数据流“管道” 
+       System.out.println(dis.readDouble());         //直接读出double型的数 
+       System.out.println(dis.readBoolean());        //直接读出boolean型 
+       dos.close(); 
+       dis.close(); 
+     }catch(IOException e){ 
+       e.printStackTrace(); 
+     } 
+  
+   } 
+} 
+打印流：java.io中专门提供用于打印的流，这类流在写入的时候有自动flush的功能，所以不需要每打印一个东西都flush一次。
+import java.io.*; 
+public class TestPrintStream1{ 
+    public static void main(String[] args){ 
+      PrintStream ps=null; 
+      try{ 
+       FileOutputStream fos=new FileOutputStream("F:\\Java\\IO\\log.dat");//创建输出流，指定输出地点 
+       ps=new PrintStream(fos);                      //在流外面包装打印流 
+      }catch(IOException e){ 
+       e.printStackTrace(); 
+      } 
+      if(ps!=null){ 
+       System.setOut(ps);                         //将系统的打印设置成打印流ps 
+      } 
+      int ln=0; 
+      for(char c=0;c<=60000;c++){ 
+        System.out.print(c+" ");                     //不在打印到dos窗口，输出流直接打印到指定文件中 
+        if(ln++>=100){ 
+           System.out.println();ln=0; 
+        } 
+      } 
+    } 
+} 
+创建Stream
+创建Stream，就是将一个数据源 （如：集合、数组）转化为一个流。
+1、通过Collection系列提供的stream()（串行） 或parallelStream()（并行）获取数据流。
+2、通过Arrays中的静态方法stream() 获取数据流。
+3、通过Stream类中的静态方法of()获取数据流。
+//1、通过Collection系列提供的stream()（串行） 或parallelStream()（并行）获取
+   List<String> list = new ArrayList<>();
+   Stream<String> stream1 = list.stream();//串行流
+   Stream<String> stream2 = list.parallelStream();//并行流
+ //2、通过Arrays中的静态方法stream() 获取数据流
+   User[] u = new User[2];
+   Stream<User> stream3 = Arrays.stream(u);
+ //3、通过Stream；类中的静态方法of()
+   Stream<String> stream4 = Stream.of("11","2");
+中间操作
+中间操作，即对数据源进行一系列的操作处理。
+多个中间操作可以连接起来性格一条流水线，除非流水线上触发器终止操作，否则中间操作不会执行任何的处理，而是在终止操作时一次性全部处理，成为惰性求值。
+//创建无限流
+//迭代
+Stream<Integer> integerStream = Stream.iterate(0,(x) -> x+2);
+//中间操作
+integerStream.limit(10).forEach(System.out::println);
+筛选filter和切片
+1、filter(predicate)-接收lambda，从流中排除某些元素。
+2、limit(n)-截断流，使其元素不超过给定数量。
+3、skip(n)-跳过元素，返回一个扔掉了前n个元素的流。若流中元素不足n个，则返回一个空流，与limit(n)互补。
+4、distinct-筛选，通过流所生成元素的hashcode()和equals()去重复元素。
+/**
+   * 打印年龄大于18的前4位用户信息（不重复）
+   * 并跳过第1个用户
+   */
+@Test
+  public void test1(){
+    list.stream()
+    .filter((x)->x.getAge()>18)
+    .distinct()
+    .limit(4)
+    .skip(1).forEach(System.out::println);
+  }
+List<String> strings = Arrays.asList("Hollis", "", "HollisChuang", "H", "hollis"); 
+strings.stream().filter(string -> !string.isEmpty()).forEach(System.out::println); 
+//Hollis, , HollisChuang, H, hollis
+映射
+1、map，接收Lambda，将元素转换成其他形式或提取信息。接收一个函数作为参数，该函数会被应用到每一个元素上，并将其映射成一个新的元素。
+2、mapToDouble/mapToInt/mapToLong，接收一个函数作为参数，该函数会被应用到每个元素上，产生一个新的DoubleStream/IntStream/LongStream。
+3、flatMap，接收一个函数作为参数，将流中的每个值都换成一个流，然后把流连接成一个流。
+@Test
+ public void test2(){
+   ///map
+   list.stream().map(User::getName)
+   .forEach(System.out::println);
+   //flatMap
+   List<List<User>> list1 = new ArrayList<>();
+   list1.add(list);
+   list1.stream().flatMap(Stream::getNames)
+   .forEach(System.out::println);
+ }
+ public static Stream<String> getNames(List<User> list){
+   List<String> list1 = new ArrayList<String>();
+   for (User user : list) {
+     list1.add(user.getName());
+   }
+   return list1.stream();
+ }
+List<Integer> numbers = Arrays.asList(3, 2, 2, 3, 7, 3, 5); 
+numbers.stream().map( i -> i*i).forEach(System.out::println); 
+//9,4,4,9,49,9,25
+排序
+1、sorted()，产生一个新流，其中按自然顺序排序。
+2、sorted(Comparator)，产生一个新流，其中按比较器顺序排序。
+@Test
+  public void test3(){
+    List<String> list =Arrays.asList("aa","bb","cc","dd");
+    list.stream().sorted()
+    .forEach(System.out::println);
+    //
+    list.stream().sorted((x,y) -> {
+      if(x.equals(y)){
+        return 1;
+      }else{
+        return -1;
+      }
+    } ).forEach(System.out::println);
+  }
+终止操作
+终止操作是执行中间操作链，并产生结果（一个新流）,数据源本身并不受影响，其结果可以是任何不是流的值。
+//创建无限流
+//迭代
+Stream<Integer> integerStream = Stream.iterate(0,(x) -> x+2);
+//终止操作
+integerStream.forEach(System.out::println);
+forEach
+Stream 提供了方法 'forEach' 来迭代流中的每个数据。以下代码片段使用 forEach 输出了10个随机数：
+Random random = new Random(); 
+random.ints().limit(10).forEach(System.out::println);
+count
+count用来统计流中的元素个数。
+List<String> strings = Arrays.asList("Hollis", "HollisChuang", "hollis","Hollis666", "Hello", "HelloWorld", "Hollis"); 
+System.out.println(strings.stream().count()); 
+//7
+collect
+collect就是一个归约操作，可以接受各种做法作为参数，将流中的元素累积成一个汇总结果：
+List<String> strings = Arrays.asList("Hollis", "HollisChuang", "hollis","Hollis666", "Hello", "HelloWorld", "Hollis"); 
+strings = strings.stream().filter(string -> string.startsWith("Hollis")).collect(Collectors.toList()); 
+System.out.println(strings); 
+//Hollis, HollisChuang, Hollis666, Hollis
+查找与匹配
+1、allMatch,检查是否匹配所有元素。
+2、anyMatch,检查是否至少匹配一个元素。
+3、noneMatch,检查是否没有匹配所有元素。
+4、findFirst,返回第一个元素。
+5、findAny,返回当前流中的任意元素。
+6、count,返回流中元素的总数。
+7、max,返回流中最大值。
+8、min,返回流中最小值。
+9、froEach(Consumer c) 内部迭代。
+@Test
+  public void test4(){
+    boolean b = list.stream().
+        noneMatch((e) ->
+        e.getName().equals("zhao"));
+    System.out.println(b);
+    Optional<User> op = list.parallelStream()
+        .filter((x) -> x.getAge() == 18)
+        .findAny();
+    System.out.println(op.get());
+  }
+归约
+reduce，可以将流中的值反复结合起来，得到一个值。
+6.转换大写
+public void test7() {
+ List<String> list = Arrays.asList("a", "MnM");
+ 
+ List<String> result = list.stream().
+ map(String::toUpperCase).
+ collect(Collectors.toList());
+ System.out.println(list);
+ System.out.println(result);
+ }
+输出
+[a, MnM]
+[A, MNM]
+7.平方
+public void test8() {
+ List<Integer> list2 = Arrays.asList(1, 2, 4);
+ List<Integer> list3 = list2.stream().
+ map(key -> key * key).
+ collect(Collectors.toList());
+ System.out.println(list2);
+ System.out.println(list3);
+ }
+输出
+[1, 2, 4]
+[1, 4, 16]
+8.找偶数
+public void test8_5() {
+ List<Integer> list2 = Arrays.asList(1, 2, 4);
+ List<Integer> list3 = list2.stream().
+ filter(key -> key % 2 == 0).
+ collect(Collectors.toList());
+ System.out.println(list2);
+ System.out.println(list3);
+ }
+9.区间值
+public void test5() {
+ System.out.println("\n");
+ IntStream.range(1, 3).forEach(System.out::println);
+ System.out.println("\n");
+ IntStream.rangeClosed(1, 3).forEach(System.out::println);
+ }
+结果
+1
+2
+ 
+ 
+1
+2
+3
+10.并发
+public void test5_pa() {
+IntStream.rangeClosed(1, 10).parallel().forEach(System.out::println);
+}
+输出
+3
+7
+1
+5
+2
+8
+10
+6
+9
+4
+11. 新的Stream继续操作
+public void test6_6() {
+ Stream.of("one", "two", "three", "four")
+ .filter(e -> e.length() > 3)
+ .peek(e -> System.out.println("Filtered value: " + e))
+ .map(String::toUpperCase)
+ .peek(e -> System.out.println("Mapped value: " + e))
+ .collect(Collectors.toList());
+ }
+结果
+Filtered value: three
+Mapped value: THREE
+Filtered value: four
+Mapped value: FOUR
+12. Optional
+public static void print(String text) {
+ System.out.println("<<<<<<");
+ System.out.println(Optional.ofNullable(text));
+ List<String> obj = new ArrayList<>();
+ Optional.ofNullable(text).ifPresent(System.out::println);
+ System.out.println(">>>>>>>>>>>>\n");
+ }
+ public static int getLength(String text) {
+ return Optional.ofNullable(text).map(String::length).orElse(-1);
+ }
+ 
+ public void test14() {
+ String strA = " abcd ", strB = null;
+ print(strA);
+ print("");
+ print(strB);
+ 
+ System.out.println(getLength(strA));
+ System.out.println(getLength(""));
+ System.out.println(getLength(strB));
+ }
+结果
+
+<<<<<<
+Optional[ abcd ]
+ abcd
+>>>>>>>>>>>>
+ 
+<<<<<<
+Optional[]
+ 
+>>>>>>>>>>>>
+ 
+<<<<<<
+Optional.empty
+>>>>>>>>>>>>
+ 
+6
+0
+-1
+13. 字符串拼接、最值、求和、过滤
+public void test15() {
+ String concat = Stream.of("A", "B", "C").reduce("", String::concat);
+ System.out.println("concat:" + concat);
+ 
+ double minValue = Stream.of(-1.5, 1.0, -3.0, -2.0).reduce(Double.MAX_VALUE, Double::min);
+ System.out.println("min:" + minValue);
+ 
+ int sumValue = Stream.of(1, 2, 3, 4).reduce(0, Integer::sum);
+ System.out.println("sum1:" + sumValue);
+ 
+ int sumValue2 = Stream.of(1, 2, 3, 4).reduce(Integer::sum).get();
+ System.out.println("sum2:" + sumValue2);
+ 
+ concat = Stream.of("a", "B", "c", "D", "e", "F").filter(x -> x.compareTo("Z") > 0).reduce("", String::concat);
+ System.out.println("concat:" + concat);
+ }
+结果
+concat:ABC
+min:-3.0
+sum1:10
+sum2:10
+concat:ace
+14. limit, skip
+public void test16() {
+ List<Person> persons = new ArrayList<>();
+ IntStream.range(1, 1000).forEach(key->persons.add(new Person(key, "jihite:" + key)));
+ List<String> personList = persons.stream().map(Person::getName).limit(10).skip(3).collect(Collectors.toList());
+ System.out.println(personList);
+ }
+输出
+[jihite:4, jihite:5, jihite:6, jihite:7, jihite:8, jihite:9, jihite:10]
+15.找出最长一行的长度
+public void test19() throws IOException {
+ String path = "**/Person.java";
+ BufferedReader br = new BufferedReader(new FileReader(path));
+ int longest = br.lines()
+ .mapToInt(String::length)
+ .max()
+ .getAsInt();
+ br.close();
+ System.out.println(longest);
+ }
+输出
+16.找出全文的单词，转小写，并排序
+public void test20() throws IOException {
+ String path = "**/Person.java";
+ BufferedReader br = new BufferedReader(new FileReader(path));
+ List<String> words = br.lines()
+ .flatMap(line->Stream.of(line.split(" ")))
+ .filter(word->word.length()>0)
+ .map(String::toLowerCase)
+ .distinct()
+ .sorted()
+ .collect(Collectors.toList());
+ br.close();
+ System.out.println(words);
+ words.forEach(key-> System.out.println(key));
+ }
+输出
+*
+*/
+/**
+//
+2018/10/24
+21:40
+=
+@author:
+@date:
+@description:
+class
+getname()
+int
+name)
+filter
+filter
+用于对Stream中的元素进行过滤，返回一个过滤后的Stream
+其方法定义如下：
+Stream<T> filter(Predicate<? super T> predicate);
+使用示例：
+Stream<String> s = Stream.of("test", "t1", "t2", "teeeee", "aaaa");
+//查找所有包含t的元素并进行打印
+s.filter(n -> n.contains("t")).forEach(System.out::println);
+map
+元素一对一转换。
+它接收一个Funcation参数，用其对Stream中的所有元素进行处理，返回的Stream对象中的元素为Function对原元素处理后的结果
+其方法定义如下：
+<R> Stream<R> map(Function<? super T, ? extends R> mapper);
+示例，假设我们要将一个String类型的Stream对象中的每个元素添加相同的后缀.txt，如a变成a.txt，其写法如下：
+Stream<String> s = Stream.of("test", "t1", "t2", "teeeee", "aaaa");
+s.map(n -> n.concat(".txt")).forEach(System.out::println);
+flatMap
+元素一对多转换：对原Stream中的所有元素使用传入的Function进行处理，每个元素经过处理后生成一个多个元素的Stream对象，然后将返回的所有Stream对象中的所有元素组合成一个统一的Stream并返回；
+方法定义如下：
+<R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper);
+示例，假设要对一个String类型的Stream进行处理，将每一个元素的拆分成单个字母，并打印：
+Stream<String> s = Stream.of("test", "t1", "t2", "teeeee", "aaaa");
+s.flatMap(n -> Stream.of(n.split(""))).forEach(System.out::println);
+takeWhile
+方法定义如下：
+default Stream<T> takeWhile(Predicate<? super T> predicate)
+如果Stream是有序的（Ordered），那么返回最长命中序列（符合传入的Predicate的最长命中序列）组成的Stream；如果是无序的，那么返回的是所有符合传入的Predicate的元素序列组成的Stream。
+与Filter有点类似，不同的地方就在当Stream是有序时，返回的只是最长命中序列。
+如以下示例，通过takeWhile查找”test”, “t1”, “t2”, “teeeee”, “aaaa”, “taaa”这几个元素中包含t的最长命中序列：
+Stream<String> s = Stream.of("test", "t1", "t2", "teeeee", "aaaa", "taaa");
+//以下结果将打印： "test", "t1", "t2", "teeeee"，最后的那个taaa不会进行打印 
+s.takeWhile(n -> n.contains("t")).forEach(System.out::println);
+
+MyBatis
+MyBatis是一个支持普通sql查询，存储过程和高级映射的优秀持久层框架。MyBatis消除了几乎所有的JDBC代码和参数的手工设置以及对结果集的检索封装。MyBatis可以使用简单的XML或注解用于配置和原始映射，将接口和Java的POJO（Plain Old Java Objects，普通的Java对象）映射成数据库中的记录。
+<mapper namespace="me.gacl.mapping.userMapper">
+为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀)
+<select id="getUser" parameterType="int"
+    resultType="me.gacl.domain.User">
+    select * from users where id=#{id}
+</select>
+在select标签中编写查询的SQL语句， 设置select标签的id属性为getUser，id属性值必须是唯一的，不能够重复
+使用parameterType属性指明查询时使用的参数类型，resultType属性指明查询返回的结果集类型
+resultType="me.gacl.domain.User"就表示将查询结果封装成一个User类的对象返回
+User类就是users表所对应的实体类
+
+算法效率
+在使用当中，算法效率分为两种，一是时间效率(时间复杂度)，二是空间效率(空间复杂度)。时间复杂度是指程序运行的速度。空间复杂度是指一个算法所需要的额外的空间。
+时间复杂度
+计算程序运行的时间不能拿简单的时间来计算，因为不同处理器处理数据的能力是不一样的。所以只算一个大概的次数就行了，俨然就是算法中的基本操作的执行次数。用大O的渐进法来表示
+void func1(int N){
+    int count = 0;
+    for (int i = 0; i < N ; i++) {
+        for (int j = 0; j < N ; j++) {
+            count++;
+        }
+    }
+    for (int k = 0; k < 2 * N ; k++) {
+        count++;
+    }
+    int M = 10;
+    while ((M--) > 0) {
+        count++;
+    }
+    System.out.println(count);
+}
+func1 的基本执行次数是：F(N) = N^2 + 2*N + 10
+推导大O阶的方法
+1、用常数1取代运行时间中的所有加法常数。
+2、在修改后的运行次数函数中，只保留最高阶项。
+3、如果最高阶项存在且不是1，则去除与这个项目相乘的常数。得到的结果就是大O阶。
+所以使用大 O 的渐进法表示之后，func1 的时间复杂度就是：O(N^2)
+算法情况
+因为当我们用算法计算的时候，会有最好情况和最坏情况和平均情况。我们常说的时间复杂度在 O(N) 这里的时间复杂度就是最坏情况。
+最好情况就是最小的运行次数。
+void func2(int N){
+    int count = 0;
+    for (int k = 0; k < 2 * N ; k++) {
+        count++;
+    }
+    int M = 10;
+    while ((M--) > 0) {
+        count++;
+    }
+    System.out.println(count);
+}
+这里的结果是 O(N) 因为根据时间复杂度的计算方法，去除常数，所以 2*N 就是 N 。M 是 10 也可以忽略掉。
+void func3(int N, int M) {
+    int count = 0;
+    for (int k = 0; k < M; k++) {
+        count++;
+    }
+    for (int k = 0; k < N ; k++) {
+        count++;
+    }
+    System.out.println(count);
+}
+这里的时间复杂度是 O(M+N) 因为 M 和 N 的值是未知的，所以是 O(M+N)
+void func4(int N) {
+    int count = 0;
+    for (int k = 0; k < 100; k++) {
+        count++;
+    }
+    System.out.println(count);
+}
+这个的时间复杂度是 O(1) 因为循环里面是常数，所以根据大 O 渐进法，结果就是 O(1)
+计算冒泡排序的时间复杂度
+public static void bubbleSort(int[] arr){
+    for (int i = 0; i < arr.length; i++) {
+        for (int j = 0; j < arr.length - 1 - i; j++) {
+            if(arr[j] > arr[j+1]){
+                int tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+}
+因为冒泡排序的特殊性，可能一次就排好了，也可能得一直排到最后，所以就有了最好情况和最坏情况。
+最好情况：就是比较一次，就是 O(N)
+最坏情况：一直排到最后，就是 O(N^2)
+计算二分查找的时间复杂度
+int binarySearch(int[] array, int value) {
+    int begin = 0;
+    int end = array.length - 1;
+    while (begin <= end) {
+        int mid = begin + ((end-begin) / 2);
+        if (array[mid] < value)
+            begin = mid + 1;
+        else if (array[mid] > value)
+            end = mid - 1;
+        else
+            return mid;
+    }
+    return -1;
+}
+因为二分查找是一半一半的找，所以每次查找之后都会把查找范围减半，比如说在一个 1 - 8 的有序数组里面查找 8 也就是查找最坏情况。
+如图，在数组当中完成二分查找需要log2n - 1次也就是时间复杂度是log2n（就是log以2为底n的对数）
+计算阶乘递归的时间复杂度
+long factorial(int N) {
+    return N < 2 ? N : factorial(N-1) * N;
+}
+计算递归的时间复杂度：递归的次数 * 每次递归执行的次数。
+所以这次递归的时候，基本操作递归了 N 次，所以时间复杂度就是 O(N)
+计算斐波那契递归的时间复杂度
+int fibonacci(int N) {
+    return N < 2 ? N : fibonacci(N-1)+fibonacci(N-2);
+}
+所以就有公式可以计算出每次计算的次数，就是：2 ^ (n - 1) ，所以计算的结果就是：2^\0 + 2^1 + 2^2 + 2^3……2^(n-1) = 2^n+1 所以按照大 O 渐进法来算，结果就是：2^n 。
+所以斐波那契数列的时间复杂度就是：2^n 。
+空间复杂度
+空间复杂度衡量的是一个算法在运行过程当中占用的额外存储空间的大小，因为没必要按照字节来算，而是算变量的个数。也是用大O渐进法表示。
+计算冒泡排序的空间复杂度
+public static void bubbleSort(int[] arr){
+    for (int i = 0; i < arr.length; i++) {
+        for (int j = 0; j < arr.length - 1 - i; j++) {
+            if(arr[j] > arr[j+1]){
+                int tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+}
+因为冒泡排序的变量并没有变化，使用的是额外空间是常数，所以空间复杂度是O(1)。
+计算斐波那契数列的空间复杂度（非递归）
+int[] fibonacci(int n) {
+    long[] fibArray = new long[n + 1];
+    fibArray[0] = 0;
+    fibArray[1] = 1;
+    for (int i = 2; i <= n ; i++) {
+        fibArray[i] = fibArray[i - 1] + fibArray [i - 2];
+    }
+    return fibArray;
+}
+因为这里的斐波那契数列开辟了 n 个额外空间，所以空间复杂度为 O(n) 。
+计算阶乘递归Factorial的时间复杂度
+int factorial(int N) {
+    return N < 2 ? N : factorial(N-1)*N;
+}
+因为是递归，每次递归都会开辟栈帧，每个栈帧占用常数个空间，所以空间复杂度就是 O(N) 。
+
+web.xml
+1.1. web.xml里要配置首页面；
+1.2. web.xml里要配置过滤器；
+1.3. web.xml里要配置拦截器；
+1.4. web.xml里要配置servlet；
+在实际项目中spring的配置文件applicationcontext.xml是通过spring提供的加载机制自动加载到容器中。在web项目中，配置文件加载到web容器中进行解析。目前，spring提供了两种加载器，以供web容器的加载：一种是ContextLoaderListener，另一种是ContextLoaderServlet。这两种在功能上完全相同，只是前一种是基于Servlet2.3版本中新引入的Listener接口实现，而后一种是基于Servlet接口实现，以下是这两种加载器在web.xml中的配置应用
+ContextLoaderListener
+<listener> 
+<listener-class>org.springframework.context.ContextLoaderListener</listener-class> 
+</listener> 
+ContextLoaderServlet
+<servlet> 
+ <servlet-name>context</servlet-name> 
+<servlet-class>org.springframework.context.ContextLoaderServlet</servlet-class> 
+ <load-on-startup>1</load-on-startup> 
+</servlet> 
+通过上面的配置，web容器会自动加载applicationcontext.xml初始化。
+如果需要指定配置文件的位置，可通过context-param加以指定：
+<context-param> 
+ <param-name>contextConfigLocation</param-name> 
+ <param-value>/WEB-INF/myApplicationContext.xml</param-value> 
+</context-param>
+之后，可以通过WebApplicationContextUtils.getWebApplicationContext方法在web应用中获取applicationcontext的引用。
+指定欢迎页面
+<welcome-file-list>
+  <welcome-file>index.jsp</welcome-file>
+  <welcome-file>index1.jsp</welcome-file>
+</welcome-file-list>
+对于tomcat来说，当你只指定一个web的根名，没有指定具体页面，去访问时一个web时，如果web.xml文件中配置了欢迎页，那么就返回指定的那个页面作为欢迎页，而在文中没有web.xml文件，或虽然有web.xml，但web.xml也没指定欢迎页的情况下，它默认先查找index.html文件，如果找到了，就把index.html作为欢迎页还回给浏览器。如果没找到index.html，tomcat就去找index.jsp。找到index.jsp就把它作为欢迎页面返回。而如果index.html和index.jsp都没找到，又没有用web.xml文件指定欢迎页面，那此时tomcat就不知道该返回哪个文件了，它就显示The requested resource (/XXX) is not available(我就出现过这个问题)的页面。其中XXX表示web的根名。但如果你指定了具体页面，是可以正常访问的。
+命名与定制URL
+<servlet>
+  <servlet-name>servlet1</servlet-name>
+  <servlet-class>net.test.TestServlet</servlet-class>
+</servlet>
+  
+<servlet-mapping>
+  <servlet-name>servlet1</servlet-name>
+  <url-pattern>*.do</url-pattern>
+</servlet-mapping>
+url-pattern的意思是所有的.do文件都会经过TestServlet处理。
+定制初始化参数
+<servlet>
+  <servlet-name>servlet1</servlet-name>
+  <servlet-class>net.test.TestServlet</servlet-class>
+  <init-param>
+     <param-name>userName</param-name>
+     <param-value>Tommy</param-value>
+  </init-param>
+  <init-param>
+     <param-name>E-mail</param-name>
+     <param-value>Tommy@163.com</param-value>
+  </init-param>
+</servlet>
+经过上面的配置，在servlet中能够调用getServletConfig().getInitParameter("param1")获得参数名对应的值。
+//上下文参数：声明应用范围内的初始化参数。 
+<context-param> 
+  <param-name>ContextParameter</para-name> 
+  <param-value>test</param-value> 
+  <description>It is a test parameter.</description> 
+</context-param> 
+//在servlet里面可以通过getServletContext().getInitParameter("context/param")
+经过上面的配置，在servlet中能够调用getServletConfig().getInitParameter("param1")获得参数名对应的值。
+//上下文参数：声明应用范围内的初始化参数。 
+<context-param> 
+  <param-name>ContextParameter</para-name> 
+  <param-value>test</param-value> 
+  <description>It is a test parameter.</description> 
+</context-param> 
+//在servlet里面可以通过getServletContext().getInitParameter("context/param")
+得到指定错误处理页面，可以通过“异常类型”或“错误码”来指定错误处理页面。
+<error-page>
+  <error-code>404</error-code>
+  <location>/error404.jsp</location>
+</error-page>
+-----------------------------
+<error-page>
+  <exception-type>java.lang.Exception<exception-type>
+  <location>/exception.jsp<location>
+</error-page>
+<error-page> 
+   <exception-type>java.lang.NullException</exception-type> 
+   <location>/error.jsp</location> 
+</error-page>
+设置过滤器：比如设置一个编码过滤器，过滤所有资源
+<filter>
+  <filter-name>XXXCharaSetFilter</filter-name>
+  <filter-class>net.test.CharSetFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>XXXCharaSetFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+6.设置监听器
+web.xml中的<listener></listener>有什么用? 没别的用处!就是配置监听类的~，它能捕捉到服务器的启动和停止! 在启动和停止触发里面的方法做相应的操作! 它必须在web.xml 中配置才能使用! web.xml 中listener元素不是只能有一个，有多个时按顺序执行。
+如何在web.xml向listener中传参数 ？
+<listener> 
+<listener-class>监听器类的完整路径</listener-class> 
+</listener>
+监听器中不能够写初始化参数; 可通过另个的途径达到初始化参数的效果: 1.写一个properties文件,在文件里写好初始化参数值, 2.在监听器中可以通得到properties文件中的值(写在静态块中)。
+设置会话(Session)过期时间，其中时间以分钟为单位
+<session-config>
+<session-timeout>60</session-timeout>
+</session-config>
+除了这些标签元素之外，还可以往web.xml中添加那些标签元素呢，那些标签元素都能起什么作用呢？我们只要去查看web.xml的模式文件就能知道。直接看模式文件看不懂，可以找一些中文教程来看看。
+加载顺序与它们在 web.xml 文件中的先后顺序无关。即不会 因为 filter 写在 listener 的前面而会先加载 filter。最终得出的结论是：listener -> filter -> servlet 。<session-config></session-config> 如果某个会话在一定时间内未被访问，服务器可 以抛弃它以节省内存。可通过使用HttpSession的setMaxInactiveInterval方法明确设置单个会话对 象的超时值，或者可利用session-config元素制定缺省超时值。
+<welcome-file-list></welcome-file-list> 指示服务器在收到引用一个目录名而不是 文件名的URL时，使用哪个文件。
+web.xml中怎么配置url-pattern？ 首先要知道 web.xml 中url-pattern的作用，他是给外部提供的一个访问DoGetDemo类的接口，你可以自己随意定义，然后在IE里面写入这个配置内容。 可以看我给你写的一个例子图片，应该一下就看懂的，用 SimpleHello.java 为例，看图片，访问的时候，可以输入下面的网址 http://192.168.0.67:8888/book/hello 这样，服务器就可以通过 <url-pattern>/hello</url-pattern> 找到ch06.SimpleHello类，因此你的<url-pattern></url-pattern> 里面的内容可以自己定义。然后在应用目录下访问这个servlet 。
+web.xml中既然有url-pattern为什么还需要servlet-class呢？url-pattern是表明什么格式的的url进入这个servlet ，servlet-class 是表明哪个java类来处理这个请求 ，一个请求过来，先到servlet-mapping中去根据请求的url寻找这个url所对应的url-pattern，找到url-pattern后找到了servlet-name， 然后根据servlet-name和servlet中的servlet-name对应找到其所对应的servlet-class，具体的业务逻辑就写在来servlet-class对应的java类中了！
+
+pom.xml
+POM是项目对象模型(Project Object Model)的简称,它是Maven项目中的文件，使用XML表示，名称叫做pom.xml。在Maven中，当谈到Project的时候，不仅仅是一堆包含代码的文件。一个Project往往包含一个配置文件，包括了与开发者有关的，缺陷跟踪系统，组织与许可，项目的URL，项目依赖，以及其他。它包含了所有与这个项目相关的东西。事实上，在Maven世界中，project可以什么都没有，甚至没有代码，但是必须包含pom.xml文件
+pom里面的仓库与setting.xml里的仓库功能是一样的。主要的区别在于，pom里的仓库是个性化的。比如一家大公司里的setting文件是公用的，所有项目都用一个setting文件，但各个子项目却会引用不同的第三方库，所以就需要在pom里设置自己需要的仓库地址。
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!-- 声明项目描述符遵循哪一个POM模型版本。模型本身的版本很少改变，虽然如此，但它仍然是必不可少的，这是为了当Maven引入了新的特性或者其他模型变更的时候，确保稳定性。 -->
+  <modelVersion>4.0.0</modelVersion>
+<!-- 项目的全球唯一标识符，通常使用全限定的包名区分该项目和其他项目。并且构建时生成的路径也是由此生成，如com.mycompany.app生成的相对路径为：/com/mycompany/app -->
+  <groupId>jp.or.ucoop</groupId>
+<!-- 构件的标识符，它和group ID一起唯一标识一个构件。本项目的唯一ID，一个groupId下面可能多个项目，就是靠artifactId来区分的；在某个特定的group ID下，artifact ID也必须是唯一的。构件是项目产生的或使用的一个东西，Maven为项目产生的构件包括：JARs，源码，二进制发布和WARs等。 -->
+  <artifactId>usys-cec-module-webapi</artifactId>
+<!-- 项目当前版本，格式为:主版本.次版本.增量版本-限定版本号 -->
+  <version>1.0.0-SNAPSHOT</version>
+<!-- 项目的名称, Maven产生的文档用 -->
+  <name>usys-cec-module-webapi</name>
+<!-- 为pom定义一些常量，在pom中的其它地方可以直接引用 使用方式 如下 ：${file.project.build.sourceEncoding} -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- バージョン指定（基盤ライブラリ）  -->
+    <cai-webapi-version>1.1.4-SNAPSHOT</cai-webapi-version>
+    <uc-webapi-version>1.1.4-SNAPSHOT</uc-webapi-version>
+    <usys-fw-webapi-version>1.1.4-SNAPSHOT</usys-fw-webapi-version>
+    <!-- バージョン指定（共通ライブラリ）  -->
+    <usys-common-webapi-version>1.0.5-SNAPSHOT</usys-common-webapi-version>
+  </properties>
+
+<!-- 构建项目需要的信息 -->
+  <build>
+<!-- 产生的构件的文件名，默认值是${artifactId}-${version}。 -->
+    <finalName>usys-cec-module-webapi</finalName>
+<!-- 使用的插件列表 。 -->
+    <plugins>
+<!-- plugin元素包含描述插件所需要的信息。 -->
+      <plugin>
+<!-- 插件在仓库里的group ID -->
+        <groupId>org.apache.maven.plugins</groupId>
+<!-- 插件在仓库里的artifact ID -->
+        <artifactId>maven-compiler-plugin</artifactId>
+<!-- 被使用的插件的版本（或版本范围） -->
+        <version>3.1</version>
+<!-- 配置是否被传播到子POM -->
+        <inherited>true</inherited>
+<!-- 作为DOM对象的配置 -->
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+<!-- 项目引入插件所需要的额外依赖 -->
+  <dependencies>
+    <!-- 基盤ライブラリ -->
+<!-- 每个dependency都对应这一个jar包 -->
+    <dependency>
+<!-- 一般情况下，maven是通过groupId、artifactId、version这三个元素值（俗称坐标）来检索该构件， 然后引入你的工程。如果别人想引用你现在开发的这个项目（前提是已开发完毕并发布到了远程仓库），就需要在他的pom文件中新建一个dependency节点，将本项目的groupId、artifactId、version写入， maven就会把你上传的jar包下载到他的本地 --> 
+      <groupId>jp.or.ucoop</groupId>
+      <artifactId>cai-webapi</artifactId>
+      <version>${cai-webapi-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jp.or.ucoop</groupId>
+      <artifactId>uc-webapi</artifactId>
+      <version>${uc-webapi-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jp.or.ucoop</groupId>
+      <artifactId>usys-fw-webapi</artifactId>
+      <version>${usys-fw-webapi-version}</version>
+    </dependency>
+    <!-- 共通ライブラリ -->
+    <dependency>
+      <groupId>jp.or.ucoop</groupId>
+      <artifactId>usys-common-webapi</artifactId>
+      <version>${usys-common-webapi-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+<!-- maven认为，程序对外部的依赖会随着程序的所处阶段和应用场景而变化，所以maven中的依赖关系有作用域(scope)的限制。scope包含如下的取值：compile（编译范围）、provided（已提供范围）、runtime（运行时范围）、test（测试范围）、system（系统范围） -->
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>
+
+applicationContextTest.xml
+1. beans标签
+Spring配置文件的根元素是beans节点，在该节点内，我们可以配置Spring内置的各种命名空间以及bean默认的几项配置，通过配置各种命名空间，然后使用各命名空间的元素来完成对Spring的配置。
+bean元素是Spring中最基本的配置单元，用来管理对象。通过该元素，Spring将创建一个对象，并在容器加载的时候实例化该对象
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/jee
+        http://www.springframework.org/schema/jee/spring-jee.xsd
+        http://mybatis.org/schema/mybatis-spring
+        http://mybatis.org/schema/mybatis-spring.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- 環境によって異なる設定値の設定ファイルを指定。
+         開発環境では同じプロジェクト内のファイルが参照され、
+         検証環境ではTomcatのshared/libのファイルが参照されるようにする想定。 -->
+    <context:property-placeholder location="classpath:env.properties"/>
+
+    <!--
+      Springコンポーネントの検索
+      @Component, @Controller, @Service, @Repositoryが付加されているか、
+      それらがメタアノテーションに持つアノテーションが付加されているクラスを登録する。
+     -->
+Spring容器初始化的时候，会扫描jp.or.ucoop.uc.ucfw,jp.or.ucoop.usys.common,jp.or.ucoop.usys.cac,jp.or.ucoop.usys.cec下标有(@Component,@Service,@Controller,@Repository)注解的类纳入spring容器管理
+    <context:component-scan base-package="jp.or.ucoop.uc.ucfw,jp.or.ucoop.usys.common,jp.or.ucoop.usys.cac,jp.or.ucoop.usys.cec" >
+    	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- データソース -->
+    <!-- 建立数据源 -->
+    <!--
+    <bean id="dataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <!-- 数据库驱动 -->
+      <property name="driverClassName" value="${cai.db.driver}" />
+      <!-- 数据库地址 -->
+      <property name="url" value="${cai.db.url}" />
+      <!-- 数据库的用户名 -->
+      <property name="username" value="${cai.db.userId}" />
+      <!-- 数据库的密码 -->
+      <property name="password" value="${cai.db.password}" />
+    </bean>
+     -->
+    <bean id="dataSource"
+        class="com.zaxxer.hikari.HikariDataSource">
+      <property name="driverClassName" value="${cai.db.driver}" />
+      <property name="jdbcUrl" value="${cai.db.url}" />
+      <property name="username" value="${cai.db.userId}" />
+      <property name="password" value="${cai.db.password}" />
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!-- @Transactionalを指定したクラスを検索し、トランザクション境界とする -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <!-- MyBatis -->
+    <!-- Daoの検索 -->
+    <mybatis:scan base-package="jp.or.ucoop" annotation="jp.or.ucoop.cai.mybatis.MyBatisDao"/>
+    <mybatis:scan base-package="jp.or.ucoop.usys.common.generated.mapper" />
+    <!-- MyBatisの設定 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+       <property name="dataSource" ref="dataSource" />
+       <property name="configLocation" value="classpath:mybatisConfig.xml" />
+    </bean>
+
+    <bean id="request" class="org.springframework.mock.web.MockHttpServletRequest"></bean>
+</beans>
+
+spring中的ioc和di
+IoC—Inversion of Control 控制反转
+在Java开发中，IoC意味着将你设计好的类交给系统去控制，而不是在你的类内部控制。IoC是一种让服务消费者不直接依赖于服务提供者的组件设计方式，是一种减少类与类之间依赖的设计原则。
+是框架的重要特征，做到控制反转需要一个容器来实现，就是我们所说的IoC容器，最常见的IoC容器是Spring。原来一个应用程序内的对象是类通过new去主动创建并实例化的，对对像创建的主动权在程序代码中。程序不仅要管理业务逻辑也要管理对的象创建和依赖关系。这是很累的，也跟软件工程 "低耦合高内聚" 的概念不十分符合。但是控制反转是在容器初始化（或者某个指定时间节点）时通过反射机制（上一篇文章有介绍）创建好对象，在使用时去容器中获取。将对象的控制权反过来交给容器管理，所以称之为“控制反转”。IoC容器的底层实现其实是工厂模式，通过工厂模式和反射机制，根据XML中给出的类名生成相应的对象。其实IoC容器的实现很简单，就是一个HashMap
+有了spring的ioc容器之后，对象的实例化和依赖关系管理都由IOC容器进行统一管理，主体类只要依赖ioc容器就够了，需要啥，容器会给他注入进去，也就是只要声明对象不用再主动去new，ioc容器帮忙把相应的对象注入到声明对象中，使其变成实例化对象。
+控制反转是一种通过描述（XML或注解）并通过第三方去生产或获取特定对象的方式。在Spring中实现控制反转的是IOC容器，其实现方法是依赖注入（Dependency Injection,DI）。
+IoC容器是Spring的核心，也可以称为Spring容器。Spring通过 IoC 容器来管理对象的实例化和初始化，以及对象从创建到销毁的整个生命周期。由 IoC 容器管理的对象称为 Spring Bean，Spring Bean 就是 Java 对象，和使用 new 运算符创建的对象没有区别。Spring 通过读取 XML 或 Java 注解中的信息来获取哪些对象需要实例化。Spring 提供 2 种不同类型的 IoC 容器，即 BeanFactory 和 ApplicationContext 容器。
+是一个概念，是一种思想。指将传统上由程序代码直接操控的对象调用权交给容器，通过容器来实现对象的装配和管理。控制反转就是对对象控制权的转移，从程序代码本身反转到了外部容器。通过容器实现对象的装配和管理。通俗点讲，将对象的创建权交给spring，我们需要new对象，则由spring帮我们创建，然后供我们使用。那么必然的我们需要创建一个容器，同时需要一种描述来让容器知道需要创建的对象与对象的关系。这个描述最具体表现就是我们可配置的文件。IoC的实质是如何管理对象，传统意义上我们使用new方式来创建对象，但在企业应用开发的过程中，大量的对象创建都在程序中维护很容易造成资源浪费，并且不利于程序的扩展。其实现方式多种多样。当前比较流行的实现方式是依赖 注入。应用广泛。
+IoC是Spring框架的核心内容，使用多种方式完美的实现了IoC，可以使用XML配置，也可以使用注解，新版本的Spring也可以零配置实现IoC。
+Spring容器在初始化时先读取配置文件，根据配置文件或元数据创建与组织对象存入容器中，程序使用时再从Ioc容器中取出需要的对象。控制反转是一种通过描述（XML或注解）并通过第三方去生产或获取特定对象的方式。在Spring中实现控制反转的是IoC容器，其实现方法是依赖注入（Dependency Injection,DI）。
+这样做的好处是什么呢？当然就是所谓的“解耦”了，可以使得程序的各模块之间的关系更为独立，只需要spring控制这些模块之间的依赖关系并在容器启动和初始化的过程中将依据这些依赖关系创建、管理和维护这些模块就好，如果需要改变模块间的依赖关系的话，甚至都不需要改变程序代码，只需要将更改的依赖关系进行修改即可，spring会在再次启动和初始化容器的过程中使得这些新的依赖关系重新建立符合新需求的模块，在这个过程中，需要注意的是代码本身不需要体现对于模块具体依赖情形的声明而只需要定义其所需模块的接口，所以这是一种典型的面向接口思想，同时最好将依赖关系以配置文件或者注解的形式表述出来，相关的spring处理类会根据这些外部的配置文件组装模块，或者扫描注解调用内部的注解处理器组装模块，以此完成IOC的过程。
+
+DI——Dependency Injection（依赖注入）
+即组件之间的依赖关系由容器在运行期决定，形象的来说，即由容器动态的将某种依赖关系注入到组件之中。依赖注入的目标并非为软件系统带来更多的功能，而是为了提升组件重用的概率，并为系统搭建一个灵活、可扩展的平台。通过依赖注入机制，我们只需要通过简单的配置，而无需任何代码就可指定目标需要的资源，完成自身的业务 逻辑，而不用关心具体的资源来自何处、由谁实现。
+IOC 还体现在自动注入依赖，依赖注入简单的理解为绑定数据，这是一种具体的技术，IOC 是思想，DI是技术实现。对象之中需要其它的对象，类如 Service 层中需要 DAO 层对象，我们不需要在 Service 中手动 new 了，只需要配置一下即可。常用的注入方式有两种，set方法注入和构造方法注入。而每一种注入方式中又有注入基本数据类型和引用数据类型之分。
+依赖注入和依赖查找是IoC的两种主要实现方式.可以把DI和IoC理解为同一件事，都是把创建实例的控制权交给容器来操作，只是两种叫法的角度不同：控制反转是从代码操作对象的角度来看，将操作对象的控制权反转交给了容器；依赖注入是从容器的角度看，我把你需要的对象或属性注入到你代码中去。
+依赖：classA 类中含有 classB 的实例，在 classA 中调用 classB 的方法完成功能，即 classA 对 classB 有依赖。
+IoC的一个重点是在系统运行中，动态的向某个对象提供它所需要的其他对象。这一点是通过DI（Dependency Injection，依赖注入）来实现的。比如对象A需要操作数据库，以前我们总是要在A中自己编写代码来获得一个Connection对象，有了 spring我们就只需要告诉spring，A中需要一个Connection，至于这个Connection怎么构造，何时构造，A不需要知道。在系统运行时，spring会在适当的时候制造一个Connection，然后像打针一样，注射到A当中，这样就完成了对各个对象之间关系的控制。A需要依赖 Connection才能正常运行，而这个Connection是由spring注入到A中的，依赖注入的名字就这么来的。那么DI是如何实现的呢？ Java 1.3之后一个重要特征是反射（reflection），它允许程序在运行的时候动态的生成对象、执行对象的方法、改变对象的属性，spring就是通过反射来实现注入的。
+
+基于注解的依赖注入
+spring容器对于Bean的创建和对象属性的依赖注入提供了注解的支持，让我们在开发中能够更加便捷的实现对象的创建和对象属性的依赖注入。
+一，对于Bean的创建spring容器提供了以下四个注解的支持：
+1、@Component　是所有受Spring 管理组件的通用形式，@Component注解可以放在类的头上，@Component不推荐使用。把资源让spring来管理。相当于xml中配置一个bean。value：指定bean的id，如果不指定value属性，默认bean的id是当前类的类名。首字母小写
+2、@Repository　　dao层持久层实现类的注解
+3、@Service　　service层业务层实现类的注解
+4、@Controller　　 controller层表现层实现类的注解
+以上四个注解在普通使用中是等效的，但在web项目中为了区分三层架构中不同层之间Bean的创建，为了避免注解使用的混乱，使用后三个注解进行区分。
+
+二，对于Bean属性的依赖注入分为两类，一类是对于属性是String类型或者基本数据类型Spring容器提供了@Value这个注解，另一类是对于属性是对象的提供了@Autowired和@Resource这两个注解。
+其中，@Autowired这个注解是spring框架自带的注解，而@Resource(javax.annotation.Resource)这个注解是javax扩展包中注解规范的一种，而spring对这一注解提供了支持。
+首先要在配置文件中配置注解扫描的驱动。
+<context:annotation-config/>
+<context:component-scan base-package="com.opensource"/>
+如果配置了注解扫描包的范围，也就是第二行，那么<context:annotation-config/>可以不用配置，因为配置扫描包的范围后，注解的驱动也就有了。
+表明com.opensource包及其子包中，如果某个类的头上带有特定的注解【@Component/@Repository/@Service/@Controller】，就会将这个对象作为Bean注册进Spring容器。也可以在<context:component-scan base-package=” ”/>中指定多个包，多个包逗号隔开。
+@Controller
+@Controller对应表现层的Bean，也就是Action，例如：
+@Controller
+@Scope("prototype")
+public class UserAction extends BaseAction<User>{
+……
+}
+使用@Controller注解标识UserAction之后，就表示要把UserAction交给Spring容器管理，在Spring容器中会存在一个名字为"userAction"的action，这个名字是根据UserAction类名来取的。注意：如果@Controller不指定其value【@Controller】，则默认的bean名字为这个类的类名首字母小写，如果指定value【@Controller(value="UserAction")】或者【@Controller("UserAction")】，则使用value作为bean的名字。
+这里的UserAction还使用了@Scope注解，@Scope("prototype")表示将Action的范围声明为原型，可以利用容器的scope="prototype"来保证每一个请求有一个单独的Action来处理，避免struts中Action的线程安全问题。spring 默认scope 是单例模式(scope="singleton")，这样只会创建一个Action对象，每次访问都是同一Action对象，数据不安全，struts2 是要求每次次访问都对应不同的Action，scope="prototype" 可以保证当有请求的时候都创建一个Action对象
+@ Service
+@Service对应的是业务层Bean，例如：
+@Service("userService")
+ public class UserServiceImpl implements UserService {
+ ………
+ }
+@Service("userService")注解是告诉Spring，当Spring要创建UserServiceImpl的的实例时，bean的名字必须叫做"userService"，这样当Action需要使用UserServiceImpl的的实例时,就可以由Spring创建好的"userService"，然后注入给Action：在Action只需要声明一个名字叫“userService”的变量来接收由Spring注入的"userService"即可，具体代码如下：
+// 注入userService
+@Resource(name = "userService")
+private UserService userService;
+在Action声明的“userService”变量的类型必须是“UserServiceImpl”或者是其父类“UserService”，否则由于类型不一致而无法注入，由于Action中的声明的“userService”变量使用了@Resource注解去标注，并且指明了其name = "userService"，这就等于告诉Spring，说我Action要实例化一个“userService”，你Spring快点帮我实例化好，然后给我，当Spring看到userService变量上的@Resource的注解时，根据其指明的name属性可以知道，Action中需要用到一个UserServiceImpl的实例，此时Spring就会把自己创建好的名字叫做"userService"的UserServiceImpl的实例注入给Action中的“userService”变量，帮助Action完成userService的实例化，这样在Action中就不用通过“UserService userService = new UserServiceImpl();”这种最原始的方式去实例化userService了。
+如果没有Spring，那么当Action需要使用UserServiceImpl时，必须通过“UserService userService = new UserServiceImpl();”主动去创建实例对象，但使用了Spring之后，Action要使用UserServiceImpl时，就不用主动去创建UserServiceImpl的实例了，创建UserServiceImpl实例已经交给Spring来做了，Spring把创建好的UserServiceImpl实例给Action，Action拿到就可以直接用了。
+Action由原来的主动创建UserServiceImpl实例后就可以马上使用，变成了被动等待由Spring创建好UserServiceImpl实例之后再注入给Action，Action才能够使用。
+这说明Action对“UserServiceImpl”类的“控制权”已经被“反转”了，原来主动权在自己手上，自己要使用“UserServiceImpl”类的实例，自己主动去new一个出来马上就可以使用了，但现在自己不能主动去new“UserServiceImpl”类的实例，new“UserServiceImpl”类的实例的权力已经被Spring拿走了，只有Spring才能够new“UserServiceImpl”类的实例，而Action只能等Spring创建好“UserServiceImpl”类的实例后，再“恳求”Spring把创建好的“UserServiceImpl”类的实例给他，这样他才能够使用“UserServiceImpl”，这就是Spring核心思想“控制反转”，也叫“依赖注入”，“依赖注入”也很好理解，Action需要使用UserServiceImpl干活，那么就是对UserServiceImpl产生了依赖，Spring把Acion需要依赖的UserServiceImpl注入(也就是“给”)给Action，这就是所谓的“依赖注入”。对Action而言，Action依赖什么东西，就请求Spring注入给他，对Spring而言，Action需要什么，Spring就主动注入给他。
+@ Repository
+@Repository对应数据访问层Bean ，例如：
+@Repository(value="userDao")
+public class UserDaoImpl extends BaseDaoImpl<User> {
+………
+}
+@Repository(value="userDao")注解是告诉Spring，让Spring创建一个名字叫“userDao”的UserDaoImpl实例。
+当Service需要使用Spring创建的名字叫“userDao”的UserDaoImpl实例时，就可以使用@Resource(name = "userDao")注解告诉Spring，Spring把创建好的userDao注入给Service即可。
+// 注入userDao，从数据库中根据用户Id取出指定用户时需要用到
+@Resource(name = "userDao")
+private BaseDao<User> userDao;
+@Resource、@AutoWired、@Qualifier都用来注入对象。其中@Resource可以以name或type方式注入，@AutoWired只能以type方式注入，@Qualifier只能以name方式注入。
+@Autowired：自动按照类型注入。当使用注解注入属性时，set方法可以省略。它只能注入其他bean类型。当有多个类型匹配时。使用要注入的对象变量名称作为bean的id，在spring容器中查找，找到了注入成功，找不到就报错。
+@Qualifier：在自动按照类型注入的基础上，再按照Bean的id注入。它在给字段注入时不能单独使用，必须和@Autowire一起使用；但是给方法参数注入时，可以单独使用。value属性是指定Bean的id
+@Resource：直接按照Bean的id注入。它也只能注入其他Bean类型。name属性是指定Bean的id
+@Value：注入基本数据类型和String类型数据
+@Scope：指定Bean的作用范围。value属性指定范围的值--singleton单例，prototype多例，request作用与web应用的请求范围，session作用与web应用的会话范围，global-session作用与集群环境中会话范围
+但它们有一些细微区别：
+1、@Resource、@Qualifier默认按 byName自动注入，@Autowired默认按byType自动注入。
+2、@Resource有两个属性是比较重要的，分是name和type。如果使用name属性，则使用byName的自动注入策略。而使用type属性时则使用byType自动注入策略。
+3、@Resources是JDK提供的注解，而@Autowired是Spring提供的注解。
+可以把@Resource当成@AutoWired @Qualifier的老大。你们有的，我都有，你们没有的，我也有
+
+Spring AOP
+AOP (Aspect Oriented Programming)意为：面向切面编程，通过预编译方式和运行期动态代理实现在不修改源代码的情况下，给程序动态统一添加功能的一种技术，可以理解成动态代理。是Spring框架中的一个重要内容。利用 AOP 可以对业务逻辑的各个部分进行隔离，使业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高开发的效率
+为什么需要切面类?
+在软件开发的过程中，有很多业务，特别是在编写核心业务的时候，往往需要很多其他的辅助业务，比如说身份验证（银行转账需要身份验证）、数据缓存、日志输出。这些往往在某个核心业务中处于辅助的部分。这些辅助的任务都有个特点，就是这些业务都处在核心业务的同一个切面上
+切面类中有什么?
+前置通知（Before）：在目标方法执行之前执行某段代码
+后置通知（AfterReturning）：在目标方执行完成后执行，如果目标方法异常，则后置通知不再执行某段代码
+异常通知（Afterthrowing）：目标方法抛出异常的时候执行某段代码
+最终通知（After）；不管目标方法是否有异常都会执行，相当于try…catch…finally中的finally。
+环绕通知（Around）：可以控制目标方法是否执行
+这些通知有什么用？
+不需要再核心代码内部添加多余的代码，而是在调用核心代码前、后、抛异常、结束时调用某部分代码。
+这里涉及到了反射的知识，因为这些通知的实现底层就是动态代理或cglib。简单来说，就是在调用核心代码前，调用的方法会被拦截下来，然后执行切面类中的某段代码。
+
+AOP在Spring中的作用
+提供声明式事务；允许用户自定义切面
+AOP的基本概念
+横切关注点：跨越应用程序多个模块的方法或功能。即与我们业务逻辑无关，但需要我们关注的部分就是横切关注点。如日志 , 安全 , 缓存 , 事务等等 ....
+Aspect(切面)：横切关注点被模块化的特殊对象。通常是一个类，里面可以定义切入点和通知
+Weaving(织入)：把切面（aspect）连接到其它的应用程序类型或者对象上，并创建一个被通知（advised）的对象。 这些可以在编译时，类加载时和运行时完成。Spring和其它纯Java AOP框架一样，在运行时完成织入
+Advice(通知)：AOP在特定的切入点上执行的增强处理，是切面必须要完成的工作，也是类中的一个方法
+Target(目标)：被通知对象
+AOP(代理)：AOP框架创建的对象，代理就是目标对象的加强。Spring中的AOP代理可以是JDK动态代理，也可以是CGLIB代理，前者基于接口，后者基于子类
+JointPoint(连接点)：程序执行过程中明确的点，一般是方法的调用
+Pointcut(切入点):就是带有通知的连接点，与切入点匹配的执行点
+Spring AOP类的实现技术
+动态代理（InvocationHandler）：JDK原生的实现方式，需要被代理的目标类必须实现接口。因为这个技术要求代理对象和目标对象实现同样的接口（兄弟两个拜把子模式）。
+cglib：通过继承被代理的目标类（认干爹模式）实现代理，所以不需要目标类实现接口。
+AspectJ：本质上是静态代理，将代理逻辑“织入”被代理的目标类编译得到的字节码文件，所以最终效果是动态的。weaver就是织入器。Spring只是借用了AspectJ中的注解。
+使用Spring实现Aop
+方式一：通过Spring API实现【主要是springAPI接口实现】
+首先编写业务接口和实现类
+public interface UserService {
+  public void add();
+  public void delete();
+  public void update();
+  public void search();
+}
+public class UserServiceImpl implements UserService{
+  public void add() {
+    System.out.println("增加了一个用户");
+  }
+ 
+  public void delete() {
+    System.out.println("删除了一个用户");
+  }
+ 
+  public void update() {
+    System.out.println("更新了一个用户");
+  }
+ 
+  public void select() {
+    System.out.println("查询了一个用户");
+  }
+}
+接着编写增强类，这里写两个：前置增强Log和后置增强AfterLog
+import org.springframework.aop.MethodBeforeAdvice;
+import java.lang.reflect.Method;
+public class Log implements MethodBeforeAdvice {
+  //method： 要执行的目标对象的方法
+  //args： 参数
+  //target: 目标对象
+  public void before(Method method, Object[] args, Object target) throws Throwable {
+    System.out.println(target.getClass().getName()+"的"+method.getName()+"被执行了");
+  }
+}
+import org.springframework.aop.AfterReturningAdvice;
+import java.lang.reflect.Method;
+public class AfterLog implements AfterReturningAdvice {
+  //returnValue;返回值
+  public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
+    System.out.println("执行了"+method.getName()+"方法，返回结果为："+returnValue);
+  }
+}
+最后在Spring的文件中注册（applicationContext.xml），并实现AOP切入，注意导入约束
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    https://www.springframework.org/schema/aop/spring-aop.xsd">
+ 
+  <!--注册bean-->
+  <bean id="userService" class="com.lf.service.UserServiceImpl"/>
+  <bean id="log" class="com.lf.log.Log"/>
+  <bean id="afterLog" class="com.lf.log.AfterLog"/>
+   
+  <!--方式一：使用原生Spring API接口 -->
+  <!--配置aop:需要导入aop的约束-->
+  <aop:config>
+  <!--切入点：expression:表达式，execution(要执行的位置！ * * * * *) -->
+  <aop:pointcut id="pointcut" expression="execution(* com.lf.service.UserServiceImpl.*(..))"/>
+  <!--执行环绕; advice-ref执行方法 . pointcut-ref切入点-->
+  <aop:advisor advice-ref="log" pointcut-ref="pointcut"/>
+  <aop:advisor advice-ref="afterLog" pointcut-ref="pointcut"/>
+  </aop:config>
+
+</beans>
+进行测试：
+import com.lf.service.UserService;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+ 
+public class MyTest {
+  @Test
+  public void test(){
+  ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+  UserService userService1 = (UserService) context.getBean("userService");
+  UserService userService = (UserService) context.getBean("userService");
+  userService.add();
+  }
+}
+运行结果：
+com.lf.service.UserServiceImpl的add被执行了
+增加了一个用户
+执行了add方法，返回结果为：null
+方式二：自定义类实现AOP【主要是切面定义】
+目标业务类不变，还是方式一中的UserServiceImpl
+写入一个切入类
+public class DiyPointCut {
+  public void before(){
+    System.out.println("========方法执行前=========");
+  }
+ 
+  public void after(){
+    System.out.println("========方法执行后=========");
+  }
+}
+在Spring中配置（applicationContext.xml）
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    https://www.springframework.org/schema/aop/spring-aop.xsd">
+ 
+  <!--注册bean-->
+  <bean id="userService" class="com.lf.service.UserServiceImpl"/>
+  <bean id="log" class="com.lf.log.Log"/>
+  <bean id="afterLog" class="com.lf.log.AfterLog"/>
+   
+  <!--方式二：自定义类-->
+  <bean id="diy" class="com.lf.diy.DiyPointCut"/>
+ 
+  <aop:config>
+  <!--自定义切面， ref 要引用的类-->
+  <aop:aspect ref="diy">
+  <!--切入点-->
+  <aop:pointcut id="point" expression="execution(* com.lf.service.UserServiceImpl.*(..))"/>
+  <!--通知-->
+  <aop:before method="before" pointcut-ref="point"/>
+  <aop:after method="after" pointcut-ref="point"/>
+  </aop:aspect>
+  </aop:config>
+</beans>
+在上面的 MyTest.java 中测试，得到结果：
+========方法执行前=========
+增加了一个用户
+========方法执行后=========
+方式三：使用注解实现【多用】
+编写一个注解实现的增强类
+package com.lf.diy;
+ 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+ 
+@Aspect //标注这个类是一个切面
+public class AnnotationPointCut {
+ 
+  @Before("execution(* com.lf.service.UserServiceImpl.*(..))")
+  public void before(){
+    System.out.println("=====方法执行前======");
+  }
+ 
+  @After("execution(* com.lf.service.UserServiceImpl.*(..))")
+  public void after(){
+    System.out.println("=====方法执行后======");
+  }
+ 
+  //在环绕增强中，我们可以给定一个参数，代表我们要获取处理切入的点；
+  @Around("execution(* com.lf.service.UserServiceImpl.*(..))")
+  public void around(ProceedingJoinPoint jp) throws Throwable {
+    System.out.println("环绕前");
+    Signature signature = jp.getSignature();//获得签名
+    System.out.println("signature:"+signature);
+ 
+    Object proceed = jp.proceed();  //执行方法
+    System.out.println("环绕后");
+ 
+    System.out.println(proceed);
+  }
+ 
+}
+在Spring配置文件中，注册bean，并增加支持注解的配置
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    https://www.springframework.org/schema/aop/spring-aop.xsd">
+ 
+  <!--注册bean-->
+  <bean id="userService" class="com.lf.service.UserServiceImpl"/>
+  <bean id="log" class="com.lf.log.Log"/>
+  <bean id="afterLog" class="com.lf.log.AfterLog"/>
+ 
+  <!--方式三-->
+  <bean id="annotationPointCut" class="com.lf.diy.AnnotationPointCut"/>
+  <!--开启注解支持！  JDK(默认 proxy-target-class="false")  cglib（proxy-target-class="true"）-->
+  <aop:aspectj-autoproxy/>
+</beans>
+在 MyTest.java 中测试
+import com.lf.service.UserService;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class MyTest {
+  @Test
+  public void test(){
+  ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+  UserService userService = (UserService) context.getBean("userService");
+  userService.add();
+  }
+}
+得到结果：
+
+环绕前
+signature:void com.lf.service.UserService.add()
+=====方法执行前======
+增加了一个用户
+=====方法执行后======
+环绕后
+null
+
+参数校验
+在日常的开发中，经常需要对方法参数进行校验（非空、长度等）。如果采用hardcode去校验（if..else..），会造成代码冗余，复用性低，导致维护成本比较高。借助Validation组件，可以很方便地通过注解来校验参数。
+JSR 是一种规范标准，规定了一些校验规范的注解，位于javax.validation.constraints包下，只提供规范不提供实现，如@NotNull，@Size 等
+hibernate Validation与hibernate ORM框架没有关系，它提供了JSR的实现，位于org.hibernate.validator.constraints包下。
+@Valid
+JSR提供了一个@Valid注解供以使用，在本文之前，绝大多数小伙伴都是在Controller中并且结合@RequestBody一起来使用它
+该注解用于验证级联的属性、方法参数或方法返回类型。
+当验证属性、方法参数或方法返回类型时，将验证对象及其属性上定义的约束，另外：此行为是递归应用的。
+什么叫级联校验，其实就是带校验的成员里存在级联对象时，也要对它完成校验。这个在实际应用场景中是比较常见的，比如入参Person对象中，还持有Child对象，我们不仅仅要完成Person的校验，也依旧还要对Child内的属性校验：
+用于验证注解是否符合要求，直接加在变量user之前，在变量中添加验证信息的要求，当不符合要求时就会在方法中返回message的错误提示信息。
+@RestController
+@RequestMapping("/user")
+public class UserController {
+    @PostMapping
+    public User create (@Valid @RequestBody User user) {
+        System.out.println(user.getId());
+        System.out.println(user.getUsername());
+        System.out.println(user.getPassword());
+        user.setId("1");
+        return user;
+    }
+}  
+在实体类的相应字段上添加用于充当校验条件的注解:
+public class User {
+    private String id;  
+ 
+    @NotBlank(message = "密码不能为空")
+    private String password;
+}
+@NotBlank注解所指的password字段，表示验证密码不能为空，如果为空的话，上面Controller中的create方法会将message中的"密码不能为空"返回。
+也可以添加其他验证信息的要求：
+
+@Constraint
+自定义了注解，那么注解的逻辑在哪里处理呢？没错，就是这个@Constraint帮我们处理。
+@Constraint(validatedBy = {SameTenant.StringChecker.class, SameTenant.LongChecker.class}) 
+这段代表注解的处理逻辑是SameTenant.StringChecker.class和SameTenant.LongChecker.class这两个类，也可以只定义一个，多个用逗号分开。
+
+
+
+限制	说明
+@Null	限制只能为null
+@NotNull	限制必须不为null
+@AssertFalse	限制必须为false
+@AssertTrue	限制必须为true
+@DecimalMax(value)	限制必须为一个不大于指定值的数字
+@DecimalMin(value)	限制必须为一个不小于指定值的数字
+@Digits(integer,fraction)	限制必须为一个小数，且整数部分的位数不能超过integer，小数部分的位数不能超过fraction
+@Future	限制必须是一个将来的日期
+@Max(value)	限制必须为一个不大于指定值的数字
+@Min(value)	限制必须为一个不小于指定值的数字
+@Past	限制必须是一个过去的日期
+@Pattern(value)	限制必须符合指定的正则表达式
+@Size(max,min)	限制字符长度必须在min到max之间
+@Past	验证注解的元素值（日期类型）比当前时间早
+@NotEmpty	验证注解的元素值不为null且不为空（字符串长度不为0、集合大小不为0）
+@NotBlank	验证注解的元素值不为空（不为null、去除首位空格后长度为0），不同于@NotEmpty，@NotBlank只应用于字符串且在比较时会去除字符串的空格
+@Email	验证注解的元素值是Email，也可以通过正则表达式和flag指定自定义的email格式
+除此之外还可以自定义验证信息的要求，例如下面的 @MyConstraint：
+public class User {
+    private String id;
+    @MyConstraint(message = "这是一个测试")
+    private String username;
+}
+注解的具体内容：
+@Constraint(validatedBy = {MyConstraintValidator.class})
+@Target({ELementtype.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MyConstraint {
+    String message();
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {}; 
+}
+下面是校验器：
+public class MyConstraintValidator implements ConstraintValidator<MyConstraint, Object> {
+    @Autowired
+    private UserService userService;
+    
+    @Override
+    public void initialie(@MyConstraint constarintAnnotation) {
+        System.out.println("my validator init");
+    }
+    
+    @Override
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        userService.getUserByUsername("seina");
+        System.out.println("valid");
+        return false;
+    }
+}
+
+Java注解(annotation)
+java内置注解
+java内置了一些注解，有些是辅助编译器一起编译时做验证使用，下面两个注解就是java内置的注解，他们用于为我们定义的注解指定某些特性：
+@Target
+用于指定我们定义的注解可以被应用在哪里，具体的位置被枚举类型ElementType定义，例如：
+     ElementType.TYPE：在类上可以使用当前注解,即只能标注在类上
+     ElementType.METHOD：在方法上可以使用当前注解,即只能标注在方法上
+     ElementType. FIELD：在属性上可以使用当前注解,即只能标注在属性上
+@Retention
+用于我们定义的注解的保留级别
+      RetentionPolice.RUNTIME：最常用，保留在字节码文件中且在该类运行时可被反射机制利用
+      RetentionPolice.CLASS：保留在字节码中，但是反射机制不可用，如若不写默认@Retention就是该级别
+      RetentionPolice.SOURCE：保留在源码中
+1、元注解
+元注解是指注解的注解。包括@Retention @Target @Document @Inherited四种。
+1.Annotation型定义为@interface, 所有的Annotation会自动继承java.lang.Annotation这一接口,并且不能再去继承别的类或是接口.
+2.参数成员只能用public或默认(default)这两个访问权修饰
+3.参数成员只能用基本类型byte,short,char,int,long,float,double,boolean八种基本数据类型和String、Enum、Class、annotations等数据类型,以及这一些类型的数组.
+4.要获取类方法和字段的注解信息，必须通过Java的反射技术来获取Annotation对象,因为你除此之外没有别的获取注解对象的方法
+5.注解也可以没有定义成员,不过这样注解就没啥用了
+自定义注解类时, 可以指定目标(类、方法、字段,构造函数等),注解的生命周期(运行时,class文件或者源码中有效),是否将注解包含在javadoc中及是否允许子类继承父类中的注解, 具体如下:
+1.@Target表示该注解目标,可能的 ElemenetType 参数包括:
+ElemenetType.CONSTRUCTOR 构造器声明
+ElemenetType.FIELD 域声明(包括 enum 实例) 
+ElemenetType.LOCAL_VARIABLE 局部变量声明 
+ElemenetType.METHOD 方法声明 
+ElemenetType.PACKAGE 包声明 
+ElemenetType.PARAMETER 参数声明 
+ElemenetType.TYPE类，接口(包括注解类型)或enum声明
+2.@Retention表示该注解的生命周期,可选的RetentionPolicy参数包括
+RetentionPolicy.SOURCE注解将被编译器丢弃 
+RetentionPolicy.CLASS注解在class文件中可用，但会被VM丢弃 
+RetentionPolicy.RUNTIME VM将在运行期也保留注释，因此可以通过反射机制读取注解的信息
+RetentionPolicy.SOURCE注解将被编译器丢弃 
+RetentionPolicy.CLASS注解在class文件中可用，但会被VM丢弃 
+RetentionPolicy.RUNTIMEVM将在运行期也保留注释，因此可以通过反射机制读取注解的信息
+3.@Documented 指示将此注解包含在javadoc中
+4.@Inherited 指示允许子类继承父类中的注解
+
+反射
+反射(Reflection)是java被视为动态语言的关键，反射机制允许程序在运行时（注意不是编译的时候）借助于Reflection API取得任何类的内部信息，并能直接操作任意对象的内部属性及方法。
+优缺点：具有灵活性但是效率较低。
+反射提高了Java程序的灵活性和扩展性，降低耦合性，提高自适应能力。它允许程序创建和控制任何类的对象，无需提前硬编码目标类
+因为是JVM操作，所以对于性能来说会有所下降。容易对程序源码造成一定的混乱。
+反射机制的应用:
+生成动态代理,面向切片编程(在调用方法的前后各加栈帧).
+在编译时根本无法知道该对象或类可能属于哪些类，程序只依靠运行时信息来发现该对象和类的真实信息
+可以通过外部文件配置，在不修改源码的情况下，来控制程序（这就是开闭原则）
+在运行时判断任意一个对象所属的类
+在运行时构造任意一个类的对象（实例化）
+在运行时判断任意一个类所具有的成员变量和方法
+在运行时调用任意一个对象的方法——动态代理
+反射机制的原理:
+1首先明确的概念: 一切皆对象----类也是对象.
+2然后知道类中的内容 :modifier constructor field method.
+3其次明白加载: 当Animal.class在硬盘中时,是一个文件,当载入到内存中,可以认为是一个对象,是java.lang.class的对象.
+想要去实现反射想要借助一些类分别是 class，Constructor，Field，Method;
+java 获取反射常使用的三种方式：
+1.通过new对象实现反射机制
+通过Object类的getClass方法来获取
+2.通过路径实现反射机制
+使用Class.forName方法
+3.通过类名实现反射机制
+使用.class的方式
+1、Class类
+Class类的实例表示正在运行的Java应用程序中的类和接口。Class没有公共的构造方法，Class对象是在加载类时由Java虚拟机以及通过调用类加载器中的defineClass方法自动构造的
+Constructor提供关于类的单个构造方法的信息以及对它的访问权限(主要提供的是对构造方法使用)
+Method提供关于类或接口上单独某个方法（以及如何访问该方法）的信息。所反映的方法可能是类方法或实例方法（包括抽象方法)
+Field主要提供对类中的成员变量的访问和使用
+Class类也使用了泛型，即是Class
+某个类的属性、方法和构造器、某个类实现了哪些接口，JRE都为其保留了一个不变的Class类型的对象，同一个类的所有对象共享同一个Class对象。
+Class本身也是一个类
+Class对象只能由系统建立对象
+一个加载的类在JVM中只会有一个Class实例
+一个Class对象对应的是一个加载到JVM中的一个class文件
+每个类的实例都会记得自己是由哪个Class实例所生成
+通过Class可以完整地得到一个类中的所有被加载结构
+Class类是Reflection的根源，针对任何想动态加载、运行的类，唯有先获得相应的Class对象
+2、通过反射获取Class对象：
+所有的类都可以通过反射获取其Class对象。
+下面通过例子列举获取类的Class对象的三种方式：
+//新建Person类
+class Person{
+    String name;
+    int age;
+    int id;
+ 
+ public Person() {
+ }
+ public Person(String name, int age) {
+ this.name = name;
+ this.age = age;
+ }
+ public String getName() {
+ return name;
+ }
+ public void setName(String name) {
+ this.name = name;
+ }
+ public int getAge() {
+ return age;
+ }
+ public void setAge(int age) {
+ this.age = age;
+ }
+}
+//测试
+public class test02 {
+ 
+ public static void main(String[] args) throws ClassNotFoundException {
+ Person person = new Person();
+ //方式一、通过包名获取
+        Class class1 = Class.forName("com.reflection.Person");
+        System.out.println(class1.hashCode());
+        //方式二、通过对象获取
+        Class class2 = person.getClass();
+        System.out.println(class3.hashCode());
+        //方式三、通过类获取
+        Class class3 = Person.class;
+        System.out.println(class3.hashCode());
+    }
+}
+结论：三种方式获取的Class对象为同一个。
+3、获取类的运行时结构
+public class test03 {
+ public static void main(String[] args) throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
+ Class c1 = Class.forName("com.reflection.Person");
+ //获得类的名字
+ String name = c1.getName();//获得包名加类名
+ String simpleName = c1.getSimpleName();//获得类名
+ 
+ //获得类的属性
+ Field[] fields = c1.getFields();//获得类的所有公有属性
+ Field[] declaredFields = c1.getDeclaredFields();//获得类的所有属性
+ Field field = c1.getField(name);//获得类的指定公有属性
+ Field declaredField = c1.getDeclaredField(name);//获得类的指定属性（所有类型均可）
+  
+ //获得类的方法
+ Method[] method = c1.getMethods();//获得本类及其父类的所有公有方法
+ Method[] declaredMethods = c1.getDeclaredMethods();//获得本类的所有方法
+ Method getName = c1.getMethod("getName", null);//获取指定方法(本类及其父类的所有公有方法)
+ Method setName = c1.getDeclaredMethod("setName", String.class);//获取指定方法(本类的所有方法)
+ 
+ //获得类的构造器
+ Constructor[] constructors = c1.getConstructors();//获取所有公有构造器
+ Constructor[] declaredConstructors = c1.getDeclaredConstructors();//获取所有构造器
+ Constructor constructor = c1.getConstructor(String.class, int.class);//获取指定公有构造器
+ Constructor declaredConstructor = c1.getDeclaredConstructor(String.class, int.class);//获取指定构造器
+ 
+ }
+}
+4、通过反射构造对象
+public class Test04 {
+ public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
+  //获得Class对象
+  Class c1 = Class.forName("com.reflection.Person");
+  //通过反射创建对象
+  Person person = (Person)c1.newInstance();//本质上是调用了无参构造器
+ 
+  Constructor constructor = c1.getDeclaredConstructor(String.class,int.class);//获取有参构造器
+  Person person2 = (Person) constructor.newInstance("name",18);//调用有参构造器创建对象
+ 
+  //通过反射调用普通方法
+  Method setName = c1.getDeclaredMethod("setName", String.class);//获取方法
+  setName.invoke(person,"name");//通过invoke调用方法
+ 
+  //通过反射操作属性
+  Field name = c1.getDeclaredField("name");//获取name属性
+  name.setAccessible(true);//关闭安全检测，关闭后可以访问私有属性（true为关闭，false为打开，默认是false）
+  name.set(person,"lalala");//设置属性的值
+ 
+ }
+}
+5、通过反射获取注解的信息
+创建类和注解
+@Testclass("db_Student2")//类注解
+//创建学生类
+class Student2{
+ @Testfield(columnname = "name",type = "varchar",length = 20)//属性注解
+ String name;
+ @Testfield(columnname = "age",type = "int",length = 3)
+ int age;
+ @Testfield(columnname = "ID",type = "int",length = 10)
+ int ID;
+ public Student2() {
+ }
+ public Student2(String name, int age, int ID) {
+  this.name = name;
+  this.age = age;
+  this.ID = ID;
+ }
+ public String getName() {
+  return name;
+ }
+ public void setName(String name) {
+  this.name = name;
+ }
+ public int getAge() {
+  return age;
+ }
+ public void setAge(int age) {
+  this.age = age;
+ }
+ public int getID() {
+  return ID;
+ }
+ public void setID(int ID) {
+  this.ID = ID;
+ }
+}
+//类的注解
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@interface Testclass{
+ String value();
+}
+//属性的注解
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@interface Testfield{
+ String columnname();
+ String type();
+ int length();
+}
+测试
+public class test05 {
+ public static void main(String[] args) throws ClassNotFoundException, NoSuchFieldException {
+  Class c1 = Class.forName("com.zjrcu.reflection.Student2");
+ 
+  //通过反射获得注解
+  Annotation[] annotations = c1.getAnnotations();
+  for (Annotation annotation : annotations) {
+   System.out.println(annotation);
+  }
+   
+  //通过反射获得注解value的值
+  Testclass testclass = (Testclass)c1.getAnnotation(Testclass.class);
+  String value = testclass.value();
+  System.out.println(value);
+   
+  //获取类中指定注解的value值
+  Field f = c1.getDeclaredField("name");
+  Testfield testfield = (Testfield) f.getAnnotation(Testfield.class);
+  System.out.println(testfield.columnname());
+  System.out.println(testfield.length());
+  System.out.println(testfield.type());
+ 
+ 
+ }
+}
+
+equals和==的区别
+在JVM中，内存分为堆内存跟栈内存。他们二者的区别是：当我们创建一个对象（new Object）时，就会调用对象的构造函数来开辟空间，将对象数据存储到堆内存中，与此同时在栈内存中生成对应的引用，当我们在后续代码中调用的时候用的都是栈内存中的引用。还需注意的一点，基本数据类型是存储在栈内存中。
+初步认识equals与==的区别：
+==是判断两个变量或实例是不是指向同一个内存空间，equals是判断两个变量或实例所指向的内存空间的值是不是相同 
+==是指对内存地址进行比较，equals()是对字符串的内容进行比较
+==指引用是否相同，equals()指的是值是否相同
+
+String,StringBuffer区别
+String 字符串常量
+StringBuffer 字符串变量（线程安全）
+StringBuilder 字符串变量（非线程安全）
+String类型和StringBuffer类型的主要性能区别其实在于String是不可变的对象,因此在每次对String类型进行改变的时候其实都等同于生成了一个新的String对象，然后将指针指向新的String对象，之前的实例对象仍然存在，如果没有被再次引用，则会被垃圾回收。所以经常改变内容的字符串最好不要用String ，因为每次生成对象都会对系统性能产生影响，特别当内存中无引用对象多了以后，JVM的GC就会开始工作，那速度是一定会相当慢的。
+StringBuffer对象则代表一个字符序列可变的字符串，当一个StringBuffer被创建以后，通过StringBuffer提供的append()、insert()、reverse()、setCharAt()、setLength()等方法可以改变这个字符串对象的字符序列。一旦通过StringBuffer生成了最终想要的字符串，就可以调用它的toString()方法将其转换为一个String对象。每次结果都会对StringBuffer对象本身进行操作，而不是生成新的对象，再改变对象引用。所以在一般情况下我们推荐使用StringBuffer，特别是字符串对象经常改变的情况下。	
+StringBuffer类中的方法都添加了synchronized关键字，也就是给这个方法添加了一个锁，用来保证线程安全。
+在某些特别情况下，String对象的字符串拼接其实是被JVM解释成了StringBuffer对象的拼接，所以这些时候String对象的速度并不会比StringBuffer对象慢，而特别是以下的字符串对象生成中，String效率是远要比StringBuffer快的：
+String S1 = “This is only a” + “ simple” + “ test”;
+StringBuffer Sb = new StringBuilder(“This is only a”).append(“ simple”).append(“ test”);
+你会很惊讶的发现，生成 String S1 对象的速度简直太快了，而这个时候 StringBuffer 居然速度上根本一点都不占优势。其实这是 JVM 的一个把戏，在 JVM 眼里，这个
+String S1 = “This is only a” + “ simple” + “test”; 其实就是：
+String S1 = “This is only a simple test”; 所以当然不需要太多的时间了。但大家这里要注意的是，如果你的字符串是来自另外的 String 对象的话，速度就没那么快了，譬如：
+String S2 = “This is only a”;
+String S3 = “ simple”;
+String S4 = “ test”;
+String S1 = S2 +S3 + S4;
+这时候JVM会规规矩矩的按照原来的方式去做
+在大部分情况下StringBuffer> String
+StringBuffer上的主要操作是append和insert方法，可重载这些方法，以接受任意类型的数据。每个方法都能有效地将给定的数据转换成字符串，然后将该字符串的字符追加或插入到字符串缓冲区中。append 方法始终将这些字符添加到缓冲区的末端；而 insert 方法则在指定的点添加字符。
+
+foreach循环
+foreach语句是for语句的特殊简化版本，但是foreach语句并不能完全取代for语句，然而，任何的foreach语句都可以改写为for语句版本。
+foreach的语句格式：
+for(元素类型t 元素变量x : 遍历对象obj){
+引用了x的java语句;
+}
+foreach简化数组和集合的遍历
+foreach语句的局限性:如果要引用数组或者集合的索引，则foreach语句无法做到，foreach仅仅老老实实地遍历数组或者集合一遍。
+foreach语句是for语句特殊情况下的增强版本，简化了编程，提高了代码的可读性和安全性（不用怕数组越界）。相对老的for语句来说是个很好的补充。提倡能用foreach的地方就不要再用for了。在用到数组索引的情况下，foreach显得力不从心，这个时候是用for语句的时候了。foreach一般结合泛型使用
+
+java异常
+在Java语言中，将程序执行中发生的不正常情况称为“异常”。(开发过程中的语法错误和逻辑错误不是异常)
+异常事件可分为两类：
+Error:Java虚拟机无法解决的严重问题。如:JVM系统内部错误、资源耗尽等严重情况。比如:StackOverflowError和OOM。一般不编写针对性 的代码进行处理。
+Exception: 其它因编程错误或偶然的外在因素导致的一般性问题，可以使用针对性的代码进行处理。例如:空指针访问 试图读取不存在的文件 网络连接中断 数组角标越界
+运行时异常和编译时异常
+运行时异常
+是指编译器不要求强制处置的异常。一般是指编程时的逻辑错误，是程序员应该积极避免其出现的异常。java.lang.RuntimeException类及它的子类都是运行时异常。
+对于这类异常，可以不作处理，因为这类异常很普遍，若全处理可能会对程序的可读性和运行效率产生影响。
+编译时异常
+是指编译器要求必须处置的异常。即程序在运行时由于外界因素造成的一般性异常。编译器要求Java程序必须捕获或声明所有编译时异常。
+对于这类异常，如果程序不处理，可能会带来意想不到的结果。
+
+Error和Exception
+1.Error
+代码示例一：java.lang.OutOfMemoryError（堆溢出）
+public class ErrorTest {
+ public static void main(String[] args) {
+ //堆溢出:java.lang.OutOfMemoryError
+ Long[] arr = new Long[1024*1024*1024];
+ }
+}
+代码示例二：java.lang.StackOverflowError（栈溢出）
+public class ErrorTest {
+ public static void main(String[] args) {
+ 
+ //栈溢出：java.lang.StackOverflowError
+ main(args);
+ }
+}
+2.Exception（运行时异常和编译时异常）
+运行时异常
+/* ******************以下是运行时异常****************** */
+//ArithmeticException
+@Test
+public void test1(){
+int num1 = 3;
+int num2 = 0;
+int num3 = 3 / 0;
+}
+ 
+//InputMismatchException
+@Test
+public void test2(){
+Scanner scanner = new Scanner(System.in);
+int i = scanner.nextInt();
+System.out.println(i);
+scanner.close();
+}
+ 
+//NumberFormatException
+@Test
+public void test3(){
+String str = "abcd";
+int num = Integer.parseInt(str);
+}
+ 
+//ClassCastException
+@Test
+public void test4(){
+Object obj = new Boolean(true);
+String str = (String)obj;
+}
+ 
+//IndexOutOfBoundsException
+@Test
+public void test5(){
+ArrayIndexOutOfBoundsException
+Byte[] bytes = new Byte[3];
+System.out.println(bytes[4]);
+}
+ 
+//NullPointerException
+@Test
+public void test6(){
+int[] arr = null;
+System.out.println(arr[1]);
+}
+编译时异常
+/* ******************以下是编译时异常****************** */
+ @Test
+ public void test7(){
+ File file = new File("a.txt");
+ //java.io.FileNotFoundException
+ FileInputStream fis = new FileInputStream(file);
+ //java.io.IOException
+ int date = fis.read();
+ while (date != -1){
+  System.out.println((char)date);
+  date = fis.read();
+ }
+ 
+ fis.close();
+ }
+对于编译时异常，我们需要异常处理
+
+异常处理：抓抛模型
+抓抛解释
+过程一：“抛”：程序在正常执行的过程中，一旦出现异常，就会在异常代码处生成一个对应异常类的对象， 并将此对象抛出；一旦抛出对象以后，其后的代码就不再执行。
+关于异常对象的产生：
+①系统自动生成的异常对象
+②手动的生成一个异常对象，并抛出（throw）
+过程二：“抓”：可以理解为异常的处理方式：① try-catch-finally ② throws
+try-catch-finally的使用
+try{
+//可能出现异常的代码
+ 
+}catch(异常类型1 变量名1){
+//处理异常的方式1
+}catch(异常类型2 变量名2){
+//处理异常的方式2
+}catch(异常类型3 变量名3){
+//处理异常的方式3
+}
+…
+finally{
+//一定会执行的代码
+}
+finally是可选的。
+使用try将可能会出现异常的代码段包装起来，在执行过程中，一旦出现异常，就会生成一个对应异常类的对象，根据此对象的类型，去catch中进行匹配
+一旦try中的异常对象匹配到某一个catch时，就进入catch中进行异常的处理。一旦处理完成，就跳出当前的
+try-catch结构（在没有写finally的情况）。继续执行其后的代码
+catch中的异常类型如果没有子父类关系，则谁声明在上，谁声明在下无所谓。
+catch中的异常类型如果满足子父类关系，则要求子类一定声明在父类的上面。否则，报错
+常用的异常对象处理的方式： ① String getMessage() ② printStackTrace()
+在try结构中声明的变量，再出了try结构以后，就不能再被调用
+try-catch-finally结构可以嵌套
+finally中声明的是一定会被执行的代码。即使catch中又出现异常了，try中有return语句，catch中有return语句等情况。
+像数据库连接、输入输出流、网络编程Socket等资源，JVM是不能自动的回收的，我们需要自己手动的进行资源的释放。此时的资源释放，就需要声明在finally中。
+@Test
+public void test1(){
+ String str = "abcd";
+ int num = 1314;
+ try {
+ num = Integer.parseInt(str);
+ 
+ System.out.println("进入try代码块!");
+ }catch (NumberFormatException e){
+ System.out.println("出现数值转换异常了！");
+ System.out.println(e.getMessage());
+ e.printStackTrace();
+ System.out.println("该catch语句块将要执行完了！");
+ } catch (NullPointerException e){
+ System.out.println("出现空指针异常！");
+ } catch (Exception e){
+ System.out.println("出现异常了");
+ }finally {
+ System.out.println("执行finally语句了！");
+ }
+ System.out.println(num);
+}
+@Test
+public void test2(){
+ File file = new File("a.txt");
+ FileInputStream fis = null;
+ try {
+  fis = new FileInputStream(file);
+  int date = fis.read();
+  while(date != -1){
+   System.out.println((char)date);
+   date = fis.read();
+  }
+ 
+ 
+ } catch (FileNotFoundException e) {
+  e.printStackTrace();
+ }catch (IOException e){
+  e.printStackTrace();
+ }finally {
+  System.out.println("执行finally语句了！");
+  try {
+   fis.close();
+  } catch (IOException e) {
+   e.printStackTrace();
+  }
+ }
+}
+总结：
+使用try-catch-finally处理编译时异常，是得程序在编译时就不再报错，但是运行时仍可能报错。相当于我们使用try-catch-finally将一个编译时可能出现的异常，延迟到运行时出现。
+开发中，由于运行时异常比较常见，所以我们通常就不针对运行时异常编写try-catch-finally了。针对于编译时异常，我们说一定要考虑异常的处理。
+
+throws + 异常类型的使用
+"throws + 异常类型"写在方法的声明处。指明此方法执行时，可能会抛出的异常类型。一旦当方法体执行时，出现异常，仍会在异常代码处生成一个异常类的对象，此对象满足throws后异常类型时，就会被抛出。异常代码后续的代码，就不再执行！
+try-catch-finally:真正的将异常给处理掉了。
+throws的方式只是将异常抛给了方法的调用者。 并没有真正将异常处理掉。
+子类重写的方法抛出的异常类型不大于父类被重写的方法抛出的异常类型（子类重写的方法也可以不抛出异常）
+public class SuperClass {
+ public void method() throws IOException {
+ 
+ }
+}
+ 
+class SubClass extends SuperClass{
+ //报错，子类重写的方法抛出的异常类型不大于父类被重写的方法抛出的异常类型
+// public void method() throws Exception{
+//
+// }
+ 
+ public void method() throws FileNotFoundException{
+ 
+ }
+}
+开发中如何选择使用try-catch-finally 还是使用throws？ 如果父类中被重写的方法没有throws方式处理异常，则子类重写的方法也不能使用throws，意味着如果
+子类重写的方法中有异常，必须使用try-catch-finally方式处理。执行的方法a中，先后又调用了另外的几个方法，这几个方法是递进关系执行的。我们建议这几个方法使用throws
+的方式进行处理。而执行的方法a可以考虑使用try-catch-finally方式进行处理。
+public class ErrorThrows {
+ public static void method1() throws IOException {
+  File file = new File("a.txt");
+  FileInputStream fileInputStream = new FileInputStream(file);
+   
+  int data = fileInputStream.read();
+  while(data != -1){
+   System.out.println((char)data);
+   data = fileInputStream.read();
+  }
+  fileInputStream.close();
+ }
+  
+ public static void method2() throws IOException {
+  method1();
+ }
+  
+ public static void method3() throws IOException {
+  method1();
+ }
+ 
+ public static void main(String[] args) {
+  try {
+   method3();
+  } catch (IOException e) {
+   e.printStackTrace();
+  }
+ }
+}
+
+手动抛出一个异常类对象(throw关键字使用)
+public class ReturnException {
+ static void method1(){
+  try{
+   System.out.println("进入方法1");
+   throw new RuntimeException("手动抛出异常");
+  }catch (Exception e){
+   e.printStackTrace();
+   System.out.println(e.getMessage());
+  } finally {
+   System.out.println("执行finally语句了！");
+  }
+ }
+ 
+ public static void main(String[] args) {
+  method1();
+ }
+}
+
+自定义异常类
+自定义异常类，有如下三步骤：
+继承于现有的异常结构：RuntimeException 、Exception
+提供全局常量：serialVersionUID
+提供重载的构造器
+自定义异常类：
+public class MyExceptionClass extends Exception{
+ 
+ static final long serialVersionUID = -5641210210148784L;
+ 
+ public MyExceptionClass() {
+ }
+ 
+ public MyExceptionClass(String message) {
+  super(message);
+ }
+}
+手动抛出上述自定义的异常类对象：
+public class MyExceptionTest {
+ 
+ static void method1() throws MyExceptionClass {
+  Scanner scanner = new Scanner(System.in);
+ 
+  System.out.println("请输入大于0的数据：");
+  double next = scanner.nextDouble();
+  if(next >0){
+   System.out.println("您输入的数据为："+next);
+  }else {
+   throw new MyExceptionClass("您输入的数据不满足要求！");
+  }
+ }
+ 
+ public static void main(String[] args) {
+  try {
+   method1();
+  } catch (MyExceptionClass myExceptionClass) {
+   myExceptionClass.printStackTrace();
+  }
+ }
+}
+
+
+
+
+
+
+
+
+
+
+
