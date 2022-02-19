@@ -1,0 +1,496 @@
+@Injectable({
+  providedIn: 'root',
+})
+DI被融入Angular框架中，用于在任何地方给新建的组件提供服务或所需的其它东西。组件是服务的消费者，也就是说，你可以把一个服务注入到组件中，让组件类得以访问该服务类。
+在Angular中，要把一个类定义为服务，就要用@Injectable()装饰器来提供元数据，以便让Angular可以把它作为依赖注入到组件中。 同样，也要使用 @Injectable() 装饰器来表明一个组件或其它类（比如另一个服务、管道或 NgModule）拥有一个依赖。
+@Injectable()装饰器会指定Angular可以在DI体系中使用此类。元数据providedIn: 'root'表示类在整个应用程序中都是可见的。
+
+@Directive
+把一个类标记为Angular指令。你可以定义自己的指令来为DOM中的元素添加自定义行为。该选项提供配置元数据，用于决定该指令在运行期间要如何处理、实例化和使用。
+像组件类一样，指令类也可以实现生命周期钩子，以影响它们的配置和行为。
+选项	说明
+selector?	
+这个CSS选择器用于在模板中标记出该指令，并触发该指令的实例化。
+可使用下列形式之一：
+element-name：根据元素名选取。
+.class：根据类名选取。
+[attribute]：根据属性名选取。
+[attribute=value]：根据属性名和属性值选取。
+:not(sub_selector)：只有当元素不匹配子选择器 sub_selector 的时候才选取。
+selector1, selector2：无论selector1还是selector2匹配时都选取。
+inputs?	
+列举某个指令的一组可供数据绑定的输入属性
+outputs?	
+列举一组可供事件绑定的输出属性。
+providers?	
+一组依赖注入令牌，它允许 DI 系统为这个指令或组件提供依赖。
+exportAs?	
+定义一个名字，用于在模板中把该指令赋值给一个变量。
+queries?	
+配置一些查询，它们将被注入到该指令中。
+host?	
+使用一组键-值对，把类的属性映射到宿主元素的绑定（Property、Attribute 和事件）。
+jit?	
+如果存在，则该指令/组件将被 AOT 编译器忽略。它会保留在发布代码中，并且 JIT 编译器会尝试在运行时在浏览器中对其进行编译。为了确保其行为正确，该应用程序必须导入 @angular/compiler 。
+使用说明
+要想定义一个指令，请为该类加上此装饰器，并提供元数据。
+import {Directive} from '@angular/core';
+@Directive({
+  selector: 'my-directive',
+})
+export class MyDirective {
+...
+}
+声明指令
+指令是可声明对象。它们必须在NgModule中声明之后，才能用在应用中。
+指令应当且只能属于一个NgModule。不要重新声明那些从其它模块中导入的指令。请把该指令类列在NgModule的declarations字段中。
+declarations: [
+ AppComponent,
+ MyDirective
+],
+
+@Component
+一个装饰器，用于把某个类标记为Angular组件，并为它配置一些元数据，以决定该组件在运行期间该如何处理、实例化和使用。
+组件是Angular应用中最基本的UI构造块。Angular应用中包含一棵组件树。
+Angular的组件是指令的一个子集，它总是有一个与之关联的模板。和其它指令不同，模板中的每个元素只能具有一个组件实例。
+组件必须从属于某个NgModule才能被其它组件或应用使用。要想让它成为某个NgModule中的一员，请把它列在@NgModule元数据的declarations字段中。
+注意，除了这些用来对指令进行配置的选项之外，你还可以通过实现生命周期钩子来控制组件的运行期行为。要了解更多，参见生命周期钩子章。
+cecdb02010v-condition.component.ts
+@Component({
+    selector: 'cec-cecdb02010v-condition',
+    templateUrl: './cecdb02010v-condition.component.html',
+    styleUrls: ['./cecdb02010v-condition.component.css']
+})
+selector(继承自Directive装饰器)
+这个CSS选择器用于在模板中标记出该指令，并触发该指令的实例化。
+cecdb02010v-page.component.html
+    <!-- 検索部 -->
+    <cec-cecdb02010v-condition [condition]="condition" [status]="status"
+        (searchEmitter)="searchHandler()" [originPageFlg]="originPageFlg">
+    </cec-cecdb02010v-condition>
+templateUrl
+Angular组件模板文件的URL。如果提供了它，就不要再用template来提供内联模板了。
+styleUrls
+一个或多个URL，指向包含本组件CSS样式表的文件。
+
+@Input()
+一个装饰器，用来把某个类字段标记为输入属性，并提供配置元数据。该输入属性会绑定到模板中的某个DOM属性。当变更检测时，Angular会自动使用这个DOM属性的值来更新此数据属性。
+使用说明
+你可以提供一个可选的仅供模板中使用的名字，在组件实例化时，会把这个名字映射到可绑定属性上。 默认情况下，输入绑定的名字就是这个可绑定属性的原始名称。
+cecdb02010v-condition.component.ts
+   /** 
+     * 親コンポーネントからの画面状態連携
+     */
+    @Input()
+    status: PageStatus;
+    /** 
+     * このコンポーネントのForm
+     */
+    form: FormGroup;
+    /** 一覧画面から遷移フラグ */
+    @Input()
+    originPageFlg: String;
+    /** 
+     * 親コンポーネントからの条件部データ連携 
+     */
+    @Input()
+    condition: Cecdb02010vConditionDto;
+cecdb02010v-page.component.html
+    <!-- 検索部 -->
+    <cec-cecdb02010v-condition [condition]="condition" [status]="status"
+        (searchEmitter)="searchHandler()" [originPageFlg]="originPageFlg">
+    </cec-cecdb02010v-condition>
+
+@Output()
+一个装饰器，用于把一个类字段标记为输出属性，并提供配置元数据。 凡是绑定到输出属性上的 DOM 属性，Angular 在变更检测期间都会自动进行更新。
+使用说明
+你可以提供一个可选的仅供模板中使用的名字，在组件实例化时，会把这个名字映射到可绑定属性上。 默认情况下，输出绑定的名字就是这个可绑定属性的原始名称。
+cecdb02010v-condition.component.ts
+    /**
+     * 検索処理のエミッタ
+     */
+    @Output()
+    searchEmitter: EventEmitter<void> = new EventEmitter();
+    /**
+     * 親コンポーネントの検索処理を発火する。
+     *
+     * @since 2021/09/14
+     */
+    search(): void {
+        this.searchEmitter.emit();
+    }
+cecdb02010v-page.component.html
+    <!-- 検索部 -->
+    <cec-cecdb02010v-condition [condition]="condition" [status]="status"
+        (searchEmitter)="searchHandler()" [originPageFlg]="originPageFlg">
+    </cec-cecdb02010v-condition>
+
+在父子指令及组件之间共享数据
+Angular 中的一个常见模式就是在父组件和一个或多个子组件之间共享数据。可以用 @Input() 和 @Output() 来实现这个模式。
+@Input()和@Output()为子组件提供了一种与其父组件通信的方法。@Input()允许父组件更新子组件中的数据。相反，@Output()允许子组件向父组件发送数据。
+
+constructor()
+constructor应该是ES6中明确使用constructor来表示构造函数的，构造函数使用在class中，用来做初始化操作。当包含constructor的类被实例化时，构造函数将被调用。
+constructor方法是类的构造函数，是一个默认方法，通过new命令创建对象实例时，自动调用该方法。一个类必须有constructor方法，如果没有显式定义，一个默认的consructor方法会被默认添加。所以即使你没有添加构造函数，也是会有一个默认的构造函数的。一般constructor方法返回实例对象this，但是也可以指定constructor方法返回一个全新的对象，让返回的实例对象不是该类的实例。
+constructor中super关键字的作用(当做函数使用)
+class A {}
+class B extends A {
+  constructor() {
+    super();  // ES6 要求，子类的构造函数必须执行一次 super 函数，否则会报错。
+  }
+}
+在constructor中必须调用super方法，因为子类没有自己的this对象，而是继承父类的this对象，然后对其进行加工,而super就代表了父类的构造函数。super虽然代表了父类 A 的构造函数，但是返回的是子类B的实例，即super内部的this指的是B，因此super()在这里相当于 ```A.prototype.constructor.call(this, props)``。
+cecdb02010v-condition.component.ts
+    /**
+     * コンストラクタ。
+     *
+     * @param fb フォームビルダー
+     * @param cacbb00020fService 画面コード名称マスタ取得部品
+     * @since 2021/09/14
+     */
+    constructor(
+        private fb: FormBuilder,
+        private cacbb00020fService: Cacbb00020fService
+    ) {
+        super();
+        // 初期化
+        this.initForm();
+        // コンボボックス作成
+        this.setComboBoxInfo();
+    }
+
+OnChanges(INTERFACE)
+一个生命周期钩子，当指令的任何一个可绑定属性发生变化时调用。 定义一个 ngOnChanges() 方法来处理这些变更。
+interface OnChanges {
+  ngOnChanges(changes: SimpleChanges): void
+}
+ngOnChanges(changes: SimpleChanges): void
+参数
+changes	SimpleChanges	那些发生了变化的属性。
+如果至少发生了一次变更，则该回调方法会在默认的变更检测器检查完可绑定属性之后、视图子节点和内容子节点检查完之前调用
+cecdb02010v-condition.component.ts
+    /**
+     * 経由で入力値が設定されたときに実行される。
+     *
+     * @param changes 変更
+     * @since 2021/09/14
+     */
+    ngOnChanges(changes: SimpleChanges): void {
+        // 画面ステータスの変更あり場合
+        if (changes.status) {
+            // 画面状態を設定
+            this.setComponentStatus();
+        }
+        // 検索条件の変更あり場合
+        if (changes.condition && this.condition) {
+            copyDtoToForm(this.condition, this.form);
+        }
+        if (this.status == PageStatus.Init) {
+            // 最初のフォーカス設定
+            this.setFocusFirst();
+        }
+    }
+
+FormBuilder(CLASS FINAL)
+使用用户指定的配置创建AbstractControl。
+class FormBuilder {
+  group(controlsConfig: { [key: string]: any; }, options: AbstractControlOptions | { [key: string]: any; } = null): FormGroup
+  control(formState: any, validatorOrOpts?: ValidatorFn | ValidatorFn[] | FormControlOptions, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[]): FormControl
+  array(controlsConfig: any[], validatorOrOpts?: ValidatorFn | AbstractControlOptions | ValidatorFn[], asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[]): FormArray
+}
+FormBuilder提供了一个语法糖，以简化FormControl、FormGroup或FormArray实例的创建过程。它会减少构建复杂表单时所需的样板代码的数量。
+cecdb02010v-condition.component.ts
+    /**
+     * コンストラクタ。
+     *
+     * @param fb フォームビルダー
+     * @param cacbb00020fService 画面コード名称マスタ取得部品
+     * @since 2021/09/14
+     */
+    constructor(
+        private fb: FormBuilder,
+        private cacbb00020fService: Cacbb00020fService
+    ) {
+        super();
+        // 初期化
+        this.initForm();
+        // コンボボックス作成
+        this.setComboBoxInfo();
+    }
+    /**
+     * フォームを作成・初期化。
+     *
+     * @since 2021/09/14
+     */
+    private initForm(): void {
+        // Formを組み立てる。
+        this.form = this.fb.group({
+            hgnCod: [''],    // 法人コード
+            hgnMsoNcr002: [''],    // 法人名称（漢字）２
+            ucoSmb: [''],    // ユーコープ締日
+            shrStoMmm: [''],    // 支払サイト（月）
+            shrStoDdd: [''],    // 支払サイト（日）
+            srkCod: [''],    // 仕入先コード
+            srkRksNcr: [''],    // 仕入先略称（漢字）
+            tncKbn: [''],    // 点検区分
+            squSygKbn: [''],    // 請求照合区分
+        });
+    }
+
+FormGroup(CLASS FINAL)
+跟踪一组FormControl实例的值和有效性状态。
+FormGroup把每个子FormControl的值聚合进一个对象，它的key是每个控件的名字。它通过归集其子控件的状态值来计算出自己的状态。比如，如果组中的任何一个控件是无效的，那么整个组就是无效的。
+FormGroup是Angular中用来定义表单的三大基本构造块之一，就像FormControl、FormArray一样。
+当实例化FormGroup时，在第一个参数中传入一组子控件。每个子控件会用控件名把自己注册进去。
+FormControlName
+根据名字将现有FormGroup中的FormControl与一个表单控件进行同步。
+cecdb02010v-condition.component.ts
+    /** 
+     * このコンポーネントのForm
+     */
+    form: FormGroup;
+    /**
+     * フォームを作成・初期化。
+     *
+     * @since 2021/09/14
+     */
+    private initForm(): void {
+        // Formを組み立てる。
+        this.form = this.fb.group({
+            hgnCod: [''],    // 法人コード
+            hgnMsoNcr002: [''],    // 法人名称（漢字）２
+            ucoSmb: [''],    // ユーコープ締日
+            shrStoMmm: [''],    // 支払サイト（月）
+            shrStoDdd: [''],    // 支払サイト（日）
+            srkCod: [''],    // 仕入先コード
+            srkRksNcr: [''],    // 仕入先略称（漢字）
+            tncKbn: [''],    // 点検区分
+            squSygKbn: [''],    // 請求照合区分
+        });
+    }
+cecdb02010v-condition.component.html
+<div class="form-horizontal" [formGroup]="form"> (模板)和组件中的form绑定起来
+...
+<!-- 法人コード-->
+<input type="text" caiHeaderLabel controlId="hgnCodLbl">
+<input type="text" caiTextBox controlId="hgnCod" formControlName="hgnCod"/>
+
+EventEmitter(CLASS FINAL)
+用在带有@Output指令的组件中，以同步或异步方式发出自定义事件，并通过订阅实例来为这些事件注册处理器。
+class EventEmitter<T> extends Subject<T> {
+  constructor(isAsync?: boolean): EventEmitter<T>
+  emit(value?: T): void
+  subscribe(next?: (value: T) => void, error?: (error: any) => void, complete?: () => void): Subscription
+}
+使用说明
+通过添加 emit() 方法来扩展 Angular 的 RxJS Subject。
+cecdb02010v-condition.component.ts
+    /**
+     * 検索処理のエミッタ
+     */
+    @Output()
+    searchEmitter: EventEmitter<void> = new EventEmitter();
+    /**
+     * 親コンポーネントの検索処理を発火する。
+     *
+     * @since 2021/09/14
+     */
+    search(): void {
+        this.searchEmitter.emit();
+    }
+cecdb02010v-condition.component.html
+<div class="headerbtn">
+    <!-- 検索ボタン -->
+    <button type="button" caiButton controlId="searchBtn" caiClearMessages (click)="search()">検索</button>
+</div>
+cecdb02010v-page.component.html
+    <!-- 検索部 -->
+    <cec-cecdb02010v-condition [condition]="condition" [status]="status"
+        (searchEmitter)="searchHandler()" [originPageFlg]="originPageFlg">
+    </cec-cecdb02010v-condition>
+
+OnInit(INTERFACE)
+一个生命周期钩子，它会在 Angular 初始化完了该指令的所有数据绑定属性之后调用。定义ngOnInit() 方法可以处理所有附加的初始化任务。
+interface OnInit {
+  ngOnInit(): void
+}
+方法
+ngOnInit()
+它的调用时机在默认的变更检测器首次检查完该指令的所有数据绑定属性之后，任何子视图或投影内容检查完之前。 它会且只会在指令初始化时调用一次。
+ngOnInit纯粹是通知开发者组件/指令已经被初始化完成了，此时组件/指令上的属性绑定操作以及输入操作已经完成，也就是说在ngOnInit函数中我们已经能够操作组件/指令中被传入的数据了：
+开发中我们经常在ngOnInit做一些初始化的工作，而这些工作尽量要避免在constructor中进行，constructor中应该只进行依赖注入而不是进行真正的业务操作。
+cecdb02010v-page.component.ts
+    /**
+     * 画面の初期化を行う。
+     *
+     * @since 2021/09/14
+     */
+    ngOnInit(): void {
+        // 遷移フラグ
+        this.originPageFlg = this.routeInfo.snapshot.data.cecdb02010vData.originPageFlg;
+        if (this.originPageFlg == "3") {
+            // 遷移検索条件
+            this.condition = deepCopy<Cecdb02010vConditionDto>(this.routeInfo.snapshot.data.cecdb02010vData.originCondition);
+            // 明細部
+            this.detail = deepCopy<Cecdb02010vDetailDto>(this.routeInfo.snapshot.data.cecdb02010vData.detail);
+        } else if (this.originPageFlg == "2") {
+            // 画面の初期化を行う
+            this.doInit();
+            // 初期値取得した「法人コード」を設定する。
+            this.condition.hgnCod = "01";
+            // 初期値取得した「法人名称（漢字）２」を設定する。
+            this.condition.hgnMsoNcr002 = ""
+        }
+        else {
+            // 画面の初期化を行う
+            this.doInit();
+        }
+        // ブラウザのURLを置き換える
+        this.location.replaceState("/cecd/cecdb02010v");
+    }
+
+AfterViewInit(INTERFACE)
+一个生命周期钩子，会在Angular完全初始化了组件的视图后调用。定义一个ngAfterViewInit()方法来处理一些额外的初始化任务。
+interface AfterViewInit {
+  ngAfterViewInit(): void
+}
+ngAfterViewInit()
+一个回调方法，它会在Angular完成了组件视图的初始化逻辑之后立即调用。在视图初始化完成之后，它只会调用一次。
+cecdb02010v-page.component.ts
+    /**
+     * 検索処理
+     */
+    ngAfterViewInit() {
+        // 起動時（一覧画面から遷移）、初期化ボタン押下（一覧画面から遷移）
+        if (this.originPageFlg == "3") {
+            this.searchHandler();
+        }
+    }
+
+OnDestroy(INTERFACE)
+一个生命周期钩子，它会在指令、管道或服务被销毁时调用。用于在实例被销毁时，执行一些自定义清理代码。
+interface OnDestroy {
+  ngOnDestroy(): void
+}
+ngOnDestroy()
+一个用于执行清理逻辑的回调方法，会在指令、管道、服务的实例被销毁后立即调用。
+cecdb02010v-page.component.ts
+    /**
+     * コンポーネントの破棄処理を行う。
+     *
+     * @since 2021/09/14
+     */
+    ngOnDestroy(): void {
+        this.renderer.removeClass(document.body, "v-acrollbar-hidden");
+    }
+
+Renderer2
+扩展此基类以实现自定义渲染器。默认情况下，Angular会把模板渲染成DOM。你可以使用自定义渲染器来拦截渲染类调用，或用于渲染一些非 DOM 的东西。
+使用 RendererFactory2 创建你的自定义渲染器。
+使用自定义渲染器可以绕过Angular的模板机制，并进行无法以声明式语法表达的自定义UI变更。 比如，如果你要设置无法静态得知名称的Property或Attribute，可以使用setProperty()或setAttribute()方法。
+cecdb02010v-page.component.ts
+    /**
+     * コンストラクタ。
+     *
+     * @param confirm 確認サービス
+     * @param location ロケーション
+     * @param renderer レンダラ
+     * @param routeInfo 路線情報
+     * @param service 仕入先請求額登録のサービス
+     * @param store 保存サービス
+     * @param waitlayer ウエイトレイヤサービス
+     * @param stackNotificationService スタック通知サービス
+     * @param ccService 変更チェックサービス
+     * @since 2021/09/14
+     */
+    constructor(
+        private confirm: CaiConfirmService,
+        private location: Location,
+        private renderer: Renderer2,
+        private routeInfo: ActivatedRoute,
+        private service: Cecdb02010vService,
+        private waitlayer: WaitlayerService,
+        private store: StoreService,
+        private ccService: ChangedCheckService,
+        private stackNotificationService: StackNotificationService,
+        private router: Router,
+    ) {
+        // 親コンストラクタ呼び出し
+        super(routeInfo.snapshot.data.pageId);
+        // スクロールバーを非表示に設定する
+        this.renderer.addClass(document.body, "v-scrollbar-hidden");
+    }
+    /**
+     * コンポーネントの破棄処理を行う。
+     *
+     * @since 2021/09/14
+     */
+    ngOnDestroy(): void {
+        this.renderer.removeClass(document.body, "v-acrollbar-hidden");
+    }
+
+@NgModule({
+  // Static, that is compiler configuration
+  declarations: [], // Configure the selectors
+
+  // Runtime, or injector configuration
+  providers: [], // Runtime injector configuration
+
+  // Composability / Grouping
+  imports: [], // composing NgModules together
+  exports: [] // making NgModules available to other parts of the app
+})
+宏观来讲，NgModule是组织Angular应用的一种方式，它们通过@NgModule装饰器中的元数据来实现这一点。这些元数据可以分成三类：
+静态的：编译器配置，用于告诉编译器指令的选择器并通过选择器匹配的方式决定要把该指令应用到模板中的什么位置。它是通过declarations数组来配置的。
+运行时：通过 providers 数组提供给注入器的配置。
+组合/分组：通过 imports 和 exports 数组来把多个 NgModule 放在一起，并让它们可用。
+
+@ViewChild()
+属性装饰器，用于配置一个视图查询。变更检测器会在视图的DOM中查找能匹配上该选择器的第一个元素或指令。如果视图的DOM发生了变化，出现了匹配该选择器的新的子节点，该属性就会被更新。
+
+CanActivate
+类可以实现的接口，用于确定是否可以激活路由。如果所有守卫都返回了 true，那么导航将继续。如果任何守卫返回 false，则导航将被取消。如果任何守卫返回 UrlTree ，当前导航被取消，新的导航开始到守卫所返回的 UrlTree。
+interface CanActivate {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree
+}
+一个接口，某些类可以实现它以扮演一个守卫，来决定该路由能否激活。 如果所有守卫都返回 true，就会继续导航。如果任何一个守卫返回了 false，就会取消导航。 如果任何一个守卫返回了 UrlTree，就会取消当前导航，并开始导航到这个守卫所返回的 UrlTree。
+canActivate()
+
+Resolve
+可以实现为数据提供者的类的接口。数据提供者类可与路由器一起使用，以在导航期间解析数据。接口定义了开始导航时调用 resolve() 路由器在最终激活路由之前等待数据解析。
+http请求数据返回有延迟，导致模版无法立刻显示。
+数据返回之前模版上所有需要用插值表达式显示某个controller的值的地方都是空的。用户体验不好。
+resolve解决办法：在进入路由之前去服务器读数据，把需要的数据都读好以后，带着这些数据进到路由里，立刻就把数据显示出来。
+
+ActivatedRouteSnapshot
+包含与当前组件相关的路由的当前瞬间信息。ActivatedRoute也可用于遍历路由器的状态树。ActivatedRouteSnapshot也能用于遍历路由器状态树。
+ActivatedRouteSnapshot.data
+声明在构造函数中
+此路由的静态数据和已解析数据
+ActivatedRouteSnapshot.queryParams
+声明在构造函数中
+所有路由共享的查询参数（?）
+
+ActivatedRoute
+允许访问与某出口中加载的组件关联路由信息。用于遍历 RouterState 树并从节点提取信息。
+ActivatedRoute.snapshot:
+本路由此刻的快照
+
+
+
+操作符是基于可观察对象构建的一些对集合进行复杂操作的函数。RxJS 定义了一些操作符，比如 map()、filter()、concat() 和 flatMap()。
+pipe()
+你可以使用管道来把这些操作符链接起来。管道让你可以把多个由操作符返回的函数组合成一个。pipe() 函数以你要组合的这些函数作为参数，并且返回一个新的函数，当执行这个新函数时，就会顺序执行那些被组合进去的函数。
+pipe() 函数也同时是 RxJS 的 Observable 上的一个方法，所以你可以用下列简写形式来达到同样的效果：
+除了可以在订阅时提供 error() 处理器外，RxJS 还提供了 catchError 操作符，它允许你在管道中处理已知错误。
+假设你有一个可观察对象，它发起 API 请求，然后对服务器返回的响应进行映射。如果服务器返回了错误或值不存在，就会生成一个错误。如果你捕获这个错误并提供了一个默认值，流就会继续处理这些值，而不会报错。
+
+FormArray
+跟踪一个控件数组的值和有效性状态，控件可以是 FormControl、FormGroup 或 FormArray 的实例。
+FormArray 聚合了数组中每个表单控件的值。 它还会根据其所有子控件的状态总结出自己的状态。比如，如果 FromArray 中的任何一个控件是无效的，那么整个数组也会变成无效的。
+FormArray 是 Angular 表单中定义的三个基本构造块之一，就像 FormControl 和 FormGroup 一样。
+FormArray.controls
+声明在构造函数中
+一个子控件数组。在注册后，每个子控件都会有一个指定的索引。
+at()
+获取数组中指定index处的AbstractControl。
