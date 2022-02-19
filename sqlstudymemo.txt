@@ -1,0 +1,536 @@
+数据库为何要有复合主键（多主键）
+并不是所有的表都要有ID这个字段.
+当表中只有一个主键时，它是唯一的索引；当表中有多个主键时，称为复合主键，复合主键联合保证唯一索引
+这时，我们可以将多个字段设置为主键，形成复合主键，这多个字段联合标识唯一性，其中，某几个主键字段值出现重复是没有问题的，只要不是有多条记录的所有主键值完全一样，就不算重复
+
+having和where的区别
+having是在分组后对数据进行过滤
+where是在分组前对数据进行过滤
+having后面可以使用聚合函数
+where后面不可以使用聚合
+在查询过程中执行顺序：from>where>group（含聚合）>having>order>select。
+所以聚合语句(sum,min,max,avg,count)要比having子句优先执行，而where子句在查询过程中执行优先级别优先于聚合语句(sum,min,max,avg,count)。
+对分组数据再次判断时要用having。如果不用这些关系就不存在使用having。直接使用where就行了。
+having就是来弥补where在分组数据判断时的不足。因为where执行优先级别要快于聚合语句。
+聚合函数：
+例如SUM, COUNT, MAX, AVG等。这些函数和其它函数的根本区别就是它们一般作用在多条记录上。
+HAVING子句可以让我们直接筛选成组后的各组数据，也可以在聚合后对组记录进行筛选，而WHERE子句在聚合前先筛选记录，也就是说作用在GROUP BY 子句和HAVING子句前。
+
+convert(varchar(10),字段名,转换格式)
+CONVERT为日期转换函数，一般就是在时间类型(datetime,smalldatetime)与字符串类型(nchar,nvarchar,char,varchar)
+相互转换的时候才用到的函数的3个参数，第1个参数为，转换后的大小，第2个为转换日期的字段或函数，第3个为转换的格式.
+0 | 0 or 100 | mon dd yyyy hh:miAM(或PM)
+1 | 101 | mm/dd/yy
+2 | 102 | yy-mm-dd
+3 | 103 | dd/mm/yy
+4 | 104 | dd-mm-yy
+5 | 105 | dd-mm-yy
+6 | 106 | dd mon yy
+7 | 107 | mon dd,yy
+8 | 108 | hh:mm:ss
+9 | 9 or 109 | mon dd yyyy hh:mi:ss:mmmmAM(或PM)
+10 | 110 | mm-dd-yy
+11 | 111 | yy/mm/dd
+12 | 112 | yymmdd
+11| 13 or 113 | dd mon yyyy hh:mi:ss:mmm(24小时制)
+14 | 114 | hh:mi:ss:mmm(24小时制)
+15 | 20 or 120 | yyyy-mm-dd hh:mi:ss(24小时制)
+16 | 21 or 121 | yyyy-mm-dd hh:mi:ss:mmm(24小时制)
+
+一、sql server日期时间函数
+Sql Server中的日期与时间函数
+1.当前系统日期、时间
+    select getdate() 
+2.dateadd  在向指定日期加上一段时间的基础上，返回新的datetime值
+   例如：向日期加上2天
+   select dateadd(day,2,'2010-10-15')  --返回：2010-10-17 00:00:00.000
+  以此类推：向日期倒推几天或几个月也是可以的。
+   select dateadd(day,-2,'2010-10-15')  --返回：2010-10-13 00:00:00.000
+   select dateadd(month,-2,'2010-10-15')  --返回：2010-08-1 00:00:00.000
+3.datediff 返回跨两个指定日期的日期和时间边界数。
+   select datediff(day,'2004-09-01','2004-09-18')   --返回：17
+4.datepart 返回代表指定日期的指定日期部分的整数。
+  select DATEPART(month, '2004-10-15')  --返回 10
+5.datename 返回代表指定日期的指定日期部分的字符串
+   select datename(weekday, '2004-10-15')  --返回：星期五
+6.day(), month(),year() --可以与datepart对照一下
+select 当前日期=convert(varchar(10),getdate(),120)
+,当前时间=convert(varchar(8),getdate(),114)
+select datename(dw,'2004-10-15')
+select 本年第多少周=datename(week,'2004-10-15')
+      ,今天是周几=datename(weekday,'2004-10-15')
+
+IF(expr1,expr2,expr3)
+如果expr1的值为true，则返回expr2的值，如果expr1的值为false，则返回expr3的值
+SELECT IF(TRUE,'A','B');    -- 输出结果：A
+SELECT IF(FALSE,'A','B');   -- 输出结果：B
+
+IFNULL(expr1,expr2)
+如果expr1的值为null，则返回expr2的值，如果expr1的值不为null，则返回expr1的值
+SELECT IFNULL(NULL,'B');    -- 输出结果：B
+SELECT IFNULL('HELLO','B'); -- 输出结果：HELLO
+
+NULLIF(expr1,expr2)
+如果expr1=expr2成立，那么返回值为null，否则返回值为expr1的值
+SELECT NULLIF('A','A');     -- 输出结果：null
+SELECT NULLIF('A','B');     -- 输出结果：A
+
+ISNULL(expr)
+如果expr的值为null，则返回1，如果expr1的值不为null，则返回0
+SELECT ISNULL(NULL);        -- 输出结果：1
+SELECT ISNULL('HELLO');     -- 输出结果：0
+isnull(value1,value2)
+value1与value2的数据类型必须一致。如果value1的值不为null，结果返回value1。如果value1为null，结果返回vaule2的值。vaule2是你设定的值。
+
+左连接（left join或left outer join）
+结果是left join子句中的左表的所有行，而不仅仅是链接列所匹配的行，如果左表中的某行在右表中没有匹配，则在相关联的结果行中右表的所有选择列均为空值（NULL）
+表A记录如下：
+aID               aNum
+1                  a20050111
+2                  a20050112
+3                  a20050113
+4                  a20050114
+5                  a20050115
+
+表B记录如下:
+bID               bName
+1                   2006032401
+2                  2006032402
+3                  2006032403
+4                  2006032404
+8                  2006032408
+left join
+sql语句如下:
+select * from A
+left join B
+on A.aID = B.bID
+结果如下:
+aID                 aNum                     bID                   bName
+1                   a20050111                1                     2006032401
+2                   a20050112                2                     2006032402
+3                   a20050113                3                     2006032403
+4                   a20050114                4                     2006032404
+5                   a20050115                NULL                  NULL
+（所影响的行数为 5 行）
+
+内连接（join 或者inner join）
+inner join并不以谁为基础,它只显示符合条件的记录. 
+select * from A
+innerjoin B
+on A.aID = B.bID
+结果如下:
+aID                 aNum                     bID                   bName
+1                   a20050111                1                     2006032401
+2                   a20050112                2                     2006032402
+3                   a20050113                3                     2006032403
+4                   a20050114                4                     2006032404
+
+${}和#{}区别与用法
+#{}这种取值是编译好SQL语句再取值,#将传入的数据都当成一个字符串，会对自动传入的数据加一个双引号。
+${}这种是取值以后再去编译SQL语句
+#{}这种方式可以防止SQL注入，简单的说#{}这种方式SQL语句是经过预编译的，它是把#{}中间的参数转义成字符串
+select * from student where student_name = #{name} 
+预编译后,会动态解析成一个参数标记符?：
+select * from student where student_name = ?
+而使用${}在动态解析时候，会传入参数字符串
+select * from student where student_name = 'lyrics'
+#{}方式能够很大程度防止sql注入。
+$方式无法防止Sql注入。
+$方式一般用于传入数据库对象，例如传入表名.
+一般能用#的就别用$.
+MyBatis排序时使用order by动态参数时需要注意，用$而不是#
+有时你只是想直接在SQL语句中插入一个不改变的字符串。比如，像 ORDER BY，你可以这样来使用：
+ORDER BY ${columnName}
+此时MyBatis不会修改或转义字符串。
+这种方式的缺点是：
+以这种方式接受从用户输出的内容并提供给语句中不变的字符串是不安全的，会导致潜在的SQL注入攻击，因此要么不允许用户输入这些字段，要么自行转义并检验。
+
+<![CDATA[]]>
+被<![CDATA[]]>这个标记所包含的内容将表示为纯文本
+在xml中，”<”、”>”、”&”等字符是不能直接存入的，否则xml语法检查时会报错，如果想在xml中使用这些符号，必须将其转义为实体，如”&lt;”、”&gt;”、”&amp;”，这样才能保存进xml文档。 
+在使用程序读取的时候，解析器会自动将这些实体转换回”<”、”>”、”&”。举个例子： 
+<age> age < 30 </age> 
+上面这种写法会报错，应该这样写： 
+<age> age &lt; 30 </age> 
+(1)转义序列字符之间不能有空格； 
+(2)转义序列必须以”;”结束； 
+(3)单独出现的”&”不会被认为是转义的开始； 
+(4)区分大小写。
+在XML中，需要转义的字符有： 
+(1)&　　　&amp; 
+(2)<　　　&lt; 
+(3)>　　　&gt; 
+(4)＂　　　&quot; 
+(5)＇　　　&apos; 
+严格来说，在XML中只有”<”和”&”是非法的，其它三个都是可以合法存在的，但是，把它们都进行转义是一个好的习惯
+为了方便起见，使用<![CDATA[]]>来包含不被xml解析器解析的内容。但要注意的是： 
+(1) 此部分不能再包含”]]>”； 
+(2) 不允许嵌套使用； 
+(3)”]]>”这部分不能包含空格或者换行。 
+它们的功能就是一样的，只是应用场景和需求有些不同： 
+(1)<![CDATA[]]>不能适用所有情况，转义字符可以； 
+(2) 对于短字符串<![CDATA[]]>写起来啰嗦，对于长字符串转义字符写起来可读性差； 
+(3) <![CDATA[]]>表示xml解析器忽略解析，所以更快。
+
+MyBatis
+mybatis是Java的持久层框架，JAVA操作数据库是通过jdbc来操作的，而mybatis是对jdbc的封装。使用mybatis之后，开发者只需要关注sql语句本身，而不必花时间去注册驱动、创建connection、statement、手动设置参数，结果集检索等jdbc繁琐的代码。
+mybatis基本过程
+Mybatis通过xml或注解的方式将要执行的各种statement（statement、preparedStatemnt、CallableStatement）配置起来，并通过java对象和statement中的sql进行映射生成最终执行的sql语句，最后由mybatis框架执行sql并将结果映射成java对象并返回。
+Cecdb02010Dao.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace命名空间，为了对sql语句进行隔离，方便管理 ，mapper开发dao方式，使用namespace有特殊作用
+mapper代理开发时将namespace指定为mapper接口的全限定名 -->
+<mapper namespace="jp.or.ucoop.usys.cec.dao.Cecdb02010Dao">
+
+  <!-- 仕入先請求額登録画面検索のSQL -->
+  <!-- 在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象
+  mapper.xml以statement为单位管理sql语句 -->
+  <!-- 根据id查询用户信息 -->
+  <!-- 
+    id：唯一标识 一个statement
+    #{}：表示 一个占位符，如果#{}中传入简单类型的参数，#{}中的名称随意
+    parameterType：输入 参数的类型，通过#{}接收parameterType输入 的参数
+    resultType：输出结果 类型，不管返回是多条还是单条，指定单条记录映射的pojo类型 -->
+  <select id="selectByHgnSmbSrkMmmDddEtc001" resultType="jp.or.ucoop.usys.cec.result.Cecdb02010DaoSelectByHgnSmbShrSrkMmmEtcResult">
+    <bind name="SU" value="new org.apache.commons.lang3.StringUtils()" />
+    SELECT
+        T1.SIM_DAT_TLK_KBN AS SIM_DAT_TLK_KBN,
+        T1.TKM_DDD AS TKM_DDD,
+        T1.TKM_UMC_IDE AS TKM_UMC_IDE,
+        T2.UMC_MSO AS UMC_NAM_NCR,
+        ISNULL(T1.ZKI_SQU_KGK, 0) AS ZKI_SQU_KGK,
+        ISNULL(T1.TIS_ZKI_SQU_KGK, 0) AS TIS_ZKI_SQU_KGK,
+        ISNULL((T1.ZKI_SQU_KGK + T1.TIS_ZKI_SQU_KGK), 0) AS SHI_KGK_001,
+        ISNULL(T1.IRG, 0) AS IRG_001,
+        ISNULL(T1.TIS_IRG, 0) AS TIS_IRG,
+        ISNULL((T1.IRG + T1.TIS_IRG), 0) AS SHI_KGK_002,
+        ISNULL(T1.SUS_KGK, 0) AS SUS_KGK,
+        ISNULL(T1.TIS_SUS_KGK, 0) AS TIS_SUS_KGK,
+        ISNULL((T1.SUS_KGK + T1.TIS_SUS_KGK), 0) AS SHI_KGK_003,
+        ISNULL(T1.SHI_SQU_ZAN, 0) AS SHI_SQU_ZAN,
+        ISNULL(T1.TIS_SHI_SQU_ZAN, 0) AS TIS_SHI_SQU_ZAN,
+        ISNULL((
+            (T1.ZKI_SQU_KGK + T1.TIS_ZKI_SQU_KGK) - (T1.IRG + T1.TIS_IRG) + (T1.SUS_KGK + T1.TIS_SUS_KGK)
+        ), 0) AS SHI_KGK_004,
+        ISNULL(T1.TOG_NHH_KGK, 0) AS TOG_NHH_KGK,
+        ISNULL(T1.TIS_TOG_NHH_KGK, 0) AS TIS_TOG_NHH_KGK,
+        ISNULL((
+            T3.TOG_NHH_KGK + T3.TIS_TOG_NHH_KGK + T8.TOG_NHH_KGK + T8.TIS_TOG_NHH_KGK + T7.TOG_NHH_KGK + T7.TIS_TOG_NHH_KGK
+             + T9.TOG_NHH_KGK + T9.TIS_TOG_NHH_KGK
+        ), 0) AS SHI_KGK_005,
+        T3.ZEI_KES_KBN AS ZEI_KES_KBN,
+        ISNULL(T3.TOG_NHH_KGK, 0) AS TOG_NHH_KGK_001,
+        ISNULL(T3.TIS_TOG_NHH_KGK, 0) AS TIS_TOG_NHH_KGK_001,
+        ISNULL((T3.TOG_NHH_KGK + T3.TIS_TOG_NHH_KGK), 0) AS SHI_KGK_006,
+        T8.ZEI_KES_KBN AS ZEI_KES_KBN_001,
+        ISNULL(T8.TOG_NHH_KGK, 0) AS TOG_NHH_KGK_002,
+        ISNULL(T8.TIS_TOG_NHH_KGK, 0) AS TIS_TOG_NHH_KGK_002,
+        ISNULL((T8.TOG_NHH_KGK + T8.TIS_TOG_NHH_KGK), 0) AS SHI_KGK_007,
+        T7.ZEI_KES_KBN AS ZEI_KES_KBN_002,
+        ISNULL(T7.TOG_NHH_KGK, 0) AS TOG_NHH_KGK_003,
+        ISNULL(T7.TIS_TOG_NHH_KGK, 0) AS TIS_TOG_NHH_KGK_003,
+        ISNULL((T7.TOG_NHH_KGK + T7.TIS_TOG_NHH_KGK), 0) AS SHI_KGK_008,
+        T9.ZEI_KES_KBN AS ZEI_KES_KBN_003,
+        ISNULL(T9.TOG_NHH_KGK, 0) AS TOG_NHH_KGK_004,
+        ISNULL(T9.TIS_TOG_NHH_KGK, 0) AS TIS_TOG_NHH_KGK_004,
+        ISNULL((T9.TOG_NHH_KGK + T9.TIS_TOG_NHH_KGK), 0) AS SHI_KGK_009,
+        ISNULL(T1.NKG, 0) AS NKG,
+        ISNULL(T1.TIS_NKG, 0) AS TIS_NKG,
+        ISNULL((
+            T3.NKG + T3.TIS_NKG + T8.NKG + T8.TIS_NKG + T7.NKG + T7.TIS_NKG + T9.NKG + T9.TIS_NKG
+        ), 0) AS SHI_KGK_010,
+        ISNULL(T3.NKG, 0) AS NKG_001,
+        ISNULL(T3.TIS_NKG, 0) AS TIS_NKG_001,
+        ISNULL((T3.NKG + T3.TIS_NKG), 0) AS SHI_KGK_011,
+        ISNULL(T8.NKG, 0) AS NKG_002,
+        ISNULL(T8.TIS_NKG, 0) AS TIS_NKG_002,
+        ISNULL((T8.NKG + T8.TIS_NKG), 0) AS SHI_KGK_012,
+        ISNULL(T7.NKG, 0) AS NKG_003,
+        ISNULL(T7.TIS_NKG, 0) AS TIS_NKG_003,
+        ISNULL((T7.NKG + T7.TIS_NKG), 0) AS SHI_KGK_013,
+        ISNULL(T9.NKG, 0) AS NKG_004,
+        ISNULL(T9.TIS_NKG, 0) AS TIS_NKG_004,
+        ISNULL((T9.NKG + T9.TIS_NKG), 0) AS SHI_KGK_014,
+        ISNULL(T1.SQU_KGK, 0) AS SQU_KGK,
+        ISNULL(T1.TIS_SQU_KGK, 0) AS TIS_SQU_KGK,
+        ISNULL((
+            (T1.ZKI_SQU_KGK + T1.TIS_ZKI_SQU_KGK) - (T1.IRG + T1.TIS_IRG) + (T1.SUS_KGK + T1.TIS_SUS_KGK) + (
+                T3.TOG_NHH_KGK + T3.TIS_TOG_NHH_KGK + T8.TOG_NHH_KGK + T8.TIS_TOG_NHH_KGK + T7.TOG_NHH_KGK + T7.TIS_TOG_NHH_KGK
+                 + T9.TOG_NHH_KGK + T9.TIS_TOG_NHH_KGK
+            ) - (
+                T3.NKG + T3.TIS_NKG + T8.NKG + T8.TIS_NKG + T7.NKG + T7.TIS_NKG + T9.NKG + T9.TIS_NKG
+            )
+        ), 0) AS SHI_KGK_015,
+        ISNULL(T3.SQU_KGK, 0) AS SQU_KGK_001,
+        ISNULL(T8.SQU_KGK, 0) AS SQU_KGK_002,
+        ISNULL(T7.SQU_KGK, 0) AS SQU_KGK_003,
+        ISNULL(T9.SQU_KGK, 0) AS SQU_KGK_004,
+        T1.SQU_KGK_KBN AS SQU_KGK_KBN,
+        T1.EXCLUSIVE_KEY,
+        T1.KHI_NUB,
+        T3.EXCLUSIVE_KEY AS EXCLUSIVE_KEY_001,
+        T8.EXCLUSIVE_KEY AS EXCLUSIVE_KEY_002,
+        T7.EXCLUSIVE_KEY AS EXCLUSIVE_KEY_003,
+        T9.EXCLUSIVE_KEY AS EXCLUSIVE_KEY_004,
+        T4.CUB_KAS,
+        T4.ACP_KBN,
+        T4.TNC_KBN,
+        T1.SHR_STO_MMM AS SHR_STO_MMM_001,
+        T1.SHR_STO_DDD AS SHR_STO_DDD_001
+    FROM
+        CECTSRKSQUHDR T1
+        LEFT OUTER JOIN CBBTUMCMST T2
+            ON T1.TKM_UMC_IDE = T2.UMC_COD
+            <![CDATA[AND T2.TYU_KIS <= T1.UCO_SMB]]>
+            <![CDATA[AND T2.TYU_SRB >= T1.UCO_SMB]]>
+            AND T2.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+        LEFT OUTER JOIN CECTSRKSQUMSI T3
+            ON T3.HGN_COD = #{dto.hgnCod}
+            AND T3.UCO_SMB = #{dto.ucoSmb}
+            AND T3.SRK_COD = #{dto.srkCod}
+            AND T3.ZEI_KES_KBN = '${@jp.ucoop.usys.cec.CecConst$CECDB02010@ZEI_KES_KBN_4}'
+            AND T3.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+        LEFT OUTER JOIN CECTSRKSQUMSI T7
+            ON T7.HGN_COD = #{dto.hgnCod}
+            AND T7.UCO_SMB = #{dto.ucoSmb}
+            AND T7.SRK_COD = #{dto.srkCod}
+            AND T7.ZEI_KES_KBN = '${@jp.ucoop.usys.cec.CecConst$CECDB02010@ZEI_KES_KBN_6}'
+            AND T7.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+        LEFT OUTER JOIN CECTSRKSQUMSI T8
+            ON T8.HGN_COD = #{dto.hgnCod}
+            AND T8.UCO_SMB = #{dto.ucoSmb}
+            AND T8.SRK_COD = #{dto.srkCod}
+            AND T8.ZEI_KES_KBN = '${@jp.ucoop.usys.cec.CecConst$CECDB02010@ZEI_KES_KBN_8}'
+            AND T8.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+        LEFT OUTER JOIN CECTSRKSQUMSI T9
+            ON T9.HGN_COD = #{dto.hgnCod}
+            AND T9.UCO_SMB = #{dto.ucoSmb}
+            AND T9.SRK_COD = #{dto.srkCod}
+            AND T9.ZEI_KES_KBN = '${@jp.ucoop.usys.cec.CecConst$CECDB02010@ZEI_KES_KBN_0}'
+            AND T9.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+        LEFT OUTER JOIN CECTSHRHDR T4
+            ON T4.HGN_COD = #{dto.hgnCod}
+            AND T4.UCO_SMB = #{dto.ucoSmb}
+            AND T4.SRK_COD = #{dto.srkCod}
+            AND T4.CUB_KAS = '${@jp.ucoop.usys.cec.CecConst$Sign@BLANK}'
+            AND T4.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+            <if test='SU.isNotEmpty(dto.shrStoMmm)'>
+            AND T4.SHR_STO_MMM = #{dto.shrStoMmm}
+            </if>
+            <if test='SU.isNotEmpty(dto.shrStoDdd)'>
+            AND T4.SHR_STO_DDD = #{dto.shrStoDdd}
+            </if>
+    <where>
+        T1.HGN_COD = #{dto.hgnCod}
+        AND T1.UCO_SMB = #{dto.ucoSmb}
+        AND T1.SRK_COD = #{dto.srkCod}
+        <if test='SU.isNotEmpty(dto.shrStoMmm)'>
+        AND T1.SHR_STO_MMM = #{dto.shrStoMmm}
+        </if>
+        <if test='SU.isNotEmpty(dto.shrStoDdd)'>
+        AND T1.SHR_STO_DDD = #{dto.shrStoDdd}
+        </if>
+        AND T1.DLE_FLG = '${@jp.ucoop.usys.cac.CacConst@DLE_OFF}'
+    </where>
+  </select>
+</mapper>
+这个配置文件中的每个sql语句，其实都是jdbc中的statement，这样的话，其实mybatis内部也是在操作statement。
+这里的<select>标签里面传参用到的是#{}，而我们要用模糊查询的时候是不能用这个直接加上%的。
+但是有一种方法就是 使用${}接收参数！如下：
+<!-- 根据用户名称查询用户信息，可能返回多条
+  ${}：表示sql的拼接，通过${}接收参数，将参数的内容不加任何修饰拼接在sql中。
+   -->
+  <select id="findUserByName" parameterType="java.lang.String" resultType="cn.itcast.mybatis.po.User">
+    select * from user where username like '%${value}%'
+  </select>
+但是上面这种方法是不加任何修饰的拼接在sql中的，也就是不能防止sql注入，所以这种方法也不能应用到实际项目中!
+所以，我在百度上搜到了另一种方式来进行模糊查询，不知道有没有什么bug，但是我测试是可以用的。
+<!-- 根据用户名模糊查询查询出员工的信息 -->
+  <select id="search" resultType="Employee">
+    SELECT 
+      <include refid="allColumns"/>
+    FROM employee a where a.name like concat(concat('%',#{name}),'%')
+  </select>
+
+为什么要有mybatis
+mybatis是一个Java的ORM框架，ORM的出现就是为了简化开发。最初的开发方式是业务逻辑和数据库查询逻辑是分开的，或者在程序中编写sql语句，或者调用 sql 存储过程。这样导致思维需要在语言逻辑和 sql 逻辑之间切换，导致开发效率低下。所以出现了一系列的ORM框架，ORM框架将数据库表和Java对象对应起来，当操作数据库时，只需要操作对象的Java对象即可，例如设置几个and条件，只需要设置几个属性即可。
+为什么要有mybatis generator
+虽然说有了mybatis框架，但是学习mybatis也需要学习成本，尤其是配置它需要的XML文件，那也是相当繁琐，而且配置中出现错误，不容易定位。当出现莫名其妙的错误或者有大批量需要生成的对象时，时常会有种生无可恋的感觉在脑中徘徊。故此， mybatis generator 应运而生了。
+它只需要简单配置，即可完成大量的表到mybatis Java对象的生成工作，不仅速度快，而且不会出错，可让开发人员真正的专注于业务逻辑的开发。
+官方提供的mybatis generator功能比较简单，对于稍微复杂但是开发中必然用到的分页功能、批量插入功能等没有实现，但已经有成熟的插件功能支持
+Mybatis Generator
+MyBatis Generator(MBG)是一个Mybatis的代码生成器MyBatis和iBATIS. 他可以生成Mybatis各个版本的代码，和iBATIS 2.2.0版本以后的代码。他可以内省数据库的表（或多个表）然后生成可以用来访问（多个）表的基础对象。这样和数据库表进行交互时不需要创建对象和配置文件。MBG的解决了对数据库操作有最大影响的一些简单的CRUD（插入，查询，更新，删除）操作。 您仍然需要对联合查询和存储过程手写SQL和对象。
+generatorConfig.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "https://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!-- 配置生成器 -->
+<generatorConfiguration>
+  <!-- 環境設定を読み込む -->
+  <properties resource="generatorConfig.env.properties" />
+  <!-- mavenによる依存関係解決はできないので、JDBCライブラリを直接指定する必要がある -->
+  <!--  <classPathEntry location="mbg-lib/mssql-jdbc-6.2.2.jre8.jar" /> -->
+  <!-- 在MBG工作的时候，需要额外加载的依赖包 location属性指明加载jar/zip包的全路径 -->
+  <classPathEntry location="C:\pleiades\workspace\usys-common-webapi\usys-common-webapi\mbg-lib\mssql-jdbc-6.2.2.jre8.jar" />
+  context:生成一组对象的环境 
+  id:必选，上下文id，用于在生成错误时提示
+  defaultModelType:指定生成对象的样式
+  1，conditional：类似hierarchical；
+  2，flat：所有内容（主键，blob）等全部生成在一个对象中；
+  3，hierarchical：主键生成一个XXKey对象(key class)，Blob等单独生成一个对象，其他简单属性在一个对象中(record class)
+  targetRuntime:
+  1，MyBatis3：默认的值，生成基于MyBatis3.x以上版本的内容，包括XXXBySample；
+  2，MyBatis3Simple：类似MyBatis3，只是不生成XXXBySample；
+  introspectedColumnImpl：类全限定名，用于扩展MBG
+  -->
+  <context id="CAI" targetRuntime="MyBatis3">
+
+    <!--
+      各種設定
+    -->
+
+    <!--
+      新しいプラグインライブラリを追加する際は、pom.xmlのplugins/plugin/dependenciesに追加する必要があるので注意すること。
+      cai-webapiのプラグインを追加または変更した際は、cai-webapiのmaven installが必要になるので注意すること。
+     -->
+    <plugin type="jp.or.ucoop.cai.mybatis.EntityClassNamePlugin" />
+    <plugin type="jp.or.ucoop.cai.mybatis.ExamplePackagePlugin">
+      <property name="targetPackage" value="jp.or.ucoop.usys.common.generated.condition"/>
+    </plugin>
+    <!--
+      名前をDaoにしてしまうと自動生成したやつとプログラマーが作ったやつが名前被りしてしまい、
+      名前を考えるのが大変になりそうなので、デフォルトのmapperのままにすることにした。
+    -->
+    <!--
+    <plugin type="jp.or.ucoop.cai.mybatis.DaoClassNamePlugin" />
+    -->
+    <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" />
+    <!-- <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin" /> -->
+    <plugin type="jp.or.ucoop.cai.mybatis.CaiRowBoundsPlugin" />
+    <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+    <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+    	<property name="searchString" value="Example"/>
+    	<property name="replaceString" value="Condition"/>
+  	</plugin>
+  	<plugin type="jp.or.ucoop.cai.mybatis.ExampleMethodNamePlugin" />
+  	<plugin type="jp.or.ucoop.cai.mybatis.EntityTrimPlugin" />
+
+    <commentGenerator>
+      <property name="suppressDate" value="true" />
+    </commentGenerator>
+    <!-- 必须要有的，使用这个配置链接数据库
+    @TODO:是否可以扩展 -->
+    <jdbcConnection driverClass="${mybatis.db.driver}"
+        connectionURL="${mybatis.db.url}"
+        userId="${mybatis.db.userId}"
+        password="${mybatis.db.password}">
+    </jdbcConnection>
+    <!-- java类型处理器 
+    用于处理DB中的类型到Java中的类型，默认使用JavaTypeResolverDefaultImpl；
+    注意一点，默认会先尝试使用Integer，Long，Short等来对应DECIMAL和 NUMERIC数据类型； -->
+    <javaTypeResolver >
+      <!-- true：使用BigDecimal对应DECIMAL和 NUMERIC数据类型
+      false：默认,
+      scale>0;length>18：使用BigDecimal;
+      scale=0;length[10,18]：使用Long；
+      scale=0;length[5,9]：使用Integer；
+      scale=0;length<5：使用Short；-->
+      <property name="useJSR310Types" value="true"/>
+      <property name="forceBigDecimals" value="true" />
+    </javaTypeResolver>
+    <!-- java模型创建器，是必须要的元素
+    负责：1，key类（见context的defaultModelType）；2，java类；3，查询类
+    targetPackage：生成的类要放的包，真实的包受enableSubPackages属性控制；
+    targetProject：目标项目，指定一个存在的目录下，生成的内容会放到指定目录中，如果目录不存在，MBG不会自动建目录-->
+    <!-- Entityの生成先を指定 -->
+    <javaModelGenerator targetPackage="jp.or.ucoop.usys.common.generated.entity" targetProject="src/main/java">
+    </javaModelGenerator>
+    <!-- 生成SQL map的XML文件生成器，
+    注意，在Mybatis3之后，我们可以使用mapper.xml文件+Mapper接口（或者不用mapper接口），
+    或者只使用Mapper接口+Annotation，所以，如果 javaClientGenerator配置中配置了需要生成XML的话，这个元素就必须配置
+    targetPackage/targetProject:同javaModelGenerator-->
+    <!-- SQLファイルの生成先を指定 -->
+    <sqlMapGenerator targetPackage="jp.or.ucoop.usys.common.generated.mapper"  targetProject="src/main/resources">
+    </sqlMapGenerator>
+
+    <!--
+      Mapper生成のタイプを指定
+      MIXEDMAPPER:アノテーションを定義したMapperインターフェースクラスとMapperファイルを生成する
+    -->
+    <!-- 对于mybatis来说，即生成Mapper接口，注意，如果没有配置该元素，那么默认不会生成Mapper接口 
+    targetPackage/targetProject:同javaModelGenerator
+    type：选择怎么生成mapper接口（在MyBatis3/MyBatis3Simple下）：
+    1，ANNOTATEDMAPPER：会生成使用Mapper接口+Annotation的方式创建（SQL生成在annotation中），不会生成对应的XML；
+    2，MIXEDMAPPER：使用混合配置，会生成Mapper接口，并适当添加合适的Annotation，但是XML会生成在XML中；
+    3，XMLMAPPER：会生成Mapper接口，接口完全依赖XML；
+    注意，如果context是MyBatis3Simple：只支持ANNOTATEDMAPPER和XMLMAPPER -->
+    <javaClientGenerator type="MIXEDMAPPER" targetPackage="jp.or.ucoop.usys.common.generated.mapper"  targetProject="src/main/java">
+    </javaClientGenerator>
+    <!-- 选择一个table来生成相关文件，可以有一个或多个table，必须要有table元素
+    选择的table会生成一下文件：
+    1，SQL map文件
+    2，生成一个主键类；
+    3，除了BLOB和主键的其他字段的类；
+    4，包含BLOB的类；
+    5，一个用户生成动态查询的条件类（selectByExample, deleteByExample），可选；
+    6，Mapper接口（可选）
+    tableName（必要）：要生成对象的表名；
+    注意：大小写敏感问题。正常情况下，MBG会自动的去识别数据库标识符的大小写敏感度，在一般情况下，MBG会
+    根据设置的schema，catalog或tablename去查询数据表，按照下面的流程：
+    1，如果schema，catalog或tablename中有空格，那么设置的是什么格式，就精确的使用指定的大小写格式去查询；
+    2，否则，如果数据库的标识符使用大写的，那么MBG自动把表名变成大写再查找；
+    3，否则，如果数据库的标识符使用小写的，那么MBG自动把表名变成小写再查找；
+    4，否则，使用指定的大小写格式查询；
+    另外的，如果在创建表的时候，使用的""把数据库对象规定大小写，就算数据库标识符是使用的大写，在这种情况下也会使用给定的大小写来创建表名；
+    这个时候，请设置delimitIdentifiers="true"即可保留大小写格式；
+    可选：
+    1，schema：数据库的schema；
+    2，catalog：数据库的catalog；
+    3，alias：为数据表设置的别名，如果设置了alias，那么生成的所有的SELECT SQL语句中，列名会变成：alias_actualColumnName
+    4，domainObjectName：生成的domain类的名字，如果不设置，直接使用表名作为domain类的名字；可以设置为somepck.domainName，那么会自动把domainName类再放到somepck包里面；
+    5，enableInsert（默认true）：指定是否生成insert语句；
+    6，enableSelectByPrimaryKey（默认true）：指定是否生成按照主键查询对象的语句（就是getById或get）；
+    7，enableSelectByExample（默认true）：MyBatis3Simple为false，指定是否生成动态查询语句；
+    8，enableUpdateByPrimaryKey（默认true）：指定是否生成按照主键修改对象的语句（即update)；
+    9，enableDeleteByPrimaryKey（默认true）：指定是否生成按照主键删除对象的语句（即delete）；
+    10，enableDeleteByExample（默认true）：MyBatis3Simple为false，指定是否生成动态删除语句；
+    11，enableCountByExample（默认true）：MyBatis3Simple为false，指定是否生成动态查询总条数语句（用于分页的总条数查询）；
+    12，enableUpdateByExample（默认true）：MyBatis3Simple为false，指定是否生成动态修改语句（只修改对象中不为空的属性）；
+    13，modelType：参考context元素的defaultModelType，相当于覆盖；
+    14，delimitIdentifiers：参考tableName的解释，注意，默认的delimitIdentifiers是双引号，如果类似MYSQL这样的数据库，使用的是`（反引号，那么还需要设置context的beginningDelimiter和endingDelimiter属性）
+    15，delimitAllColumns：设置是否所有生成的SQL中的列名都使用标识符引起来。默认为false，delimitIdentifiers参考context的属性
+    注意，table里面很多参数都是对javaModelGenerator，context等元素的默认属性的一个复写；-->
+   	<table tableName="ZBTBATLOG" domainObjectName="CzbtBatLog" >
+   	    <!-- 参考 javaModelGenerator的useActualColumnNames属性-->
+     	<property name="useActualColumnNames" value="false"/>
+     	<!-- generatedKey用于生成生成主键的方法，
+        如果设置了该元素，MBG会在生成的<insert>元素中生成一条正确的<selectKey>元素，该元素可选
+        column:主键的列名；
+        sqlStatement：要生成的selectKey语句，有以下可选项：
+        Cloudscape:相当于selectKey的SQL为： VALUES IDENTITY_VAL_LOCAL()
+        DB2 :相当于selectKey的SQL为： VALUES IDENTITY_VAL_LOCAL()
+        DB2_MF :相当于selectKey的SQL为：SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1
+        Derby :相当于selectKey的SQL为：VALUES IDENTITY_VAL_LOCAL()
+        HSQLDB :相当于selectKey的SQL为：CALL IDENTITY()
+        Informix :相当于selectKey的SQL为：select dbinfo('sqlca.sqlerrd1') from systables where tabid=1
+        MySql :相当于selectKey的SQL为：SELECT LAST_INSERT_ID()
+        SqlServer :相当于selectKey的SQL为：SELECT SCOPE_IDENTITY()
+        SYBASE :相当于selectKey的SQL为：SELECT @@IDENTITY
+        JDBC :相当于在生成的insert元素上添加useGeneratedKeys="true"和keyProperty属性
+     	<generatedKey column="MSG_SEQ" sqlStatement="JDBC" identity="true" />
+	</table>
+
+   	<table tableName="ZBTBATLOGDTL" domainObjectName="CzbtBatLogDtl" >
+     	<property name="useActualColumnNames" value="false"/>
+     	<generatedKey column="MSG_DTL_SEQ" sqlStatement="JDBC" identity="true" />
+	</table>
+
+   	<table tableName="ZBTUPPOWNFIL" domainObjectName="Czbtuppownfil" >
+     	<property name="useActualColumnNames" value="false"/>
+	</table>
+
+  </context>
+</generatorConfiguration>
+
